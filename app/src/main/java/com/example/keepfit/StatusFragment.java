@@ -1,5 +1,6 @@
 package com.example.keepfit;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.pnikosis.materialishprogress.ProgressWheel;
 
 public class StatusFragment extends Fragment {
 
@@ -23,6 +26,12 @@ public class StatusFragment extends Fragment {
                 Toast.makeText(getContext(), "My milkshake brings all the boys to the yard.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        ProgressWheel wheel = (ProgressWheel) view.findViewById(R.id.progress_wheel);
+
+        wheel.setProgress(0.7f);
+
+        wheel.setBarColor(Color.parseColor("#78BE49"));
 
         return view;
     }
