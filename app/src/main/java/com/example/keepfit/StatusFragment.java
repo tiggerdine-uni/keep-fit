@@ -29,7 +29,7 @@ public class StatusFragment extends Fragment {
 
         mWheel = (ProgressWheel) view.findViewById(R.id.progress_wheel);
 
-        float progress = 0.69f;
+        float progress = 0.85f;
 
         mWheel.setProgress(progress);
 
