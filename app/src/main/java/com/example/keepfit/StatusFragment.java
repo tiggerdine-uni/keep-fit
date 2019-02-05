@@ -1,5 +1,7 @@
 package com.example.keepfit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -23,7 +25,25 @@ public class StatusFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "My milkshake brings all the boys to the yard.", Toast.LENGTH_SHORT).show();
+                // TODO refactor
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+
+                builder.setView(inflater.inflate(R.layout.dialog_record, null))
+                        .setPositiveButton("y", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // TODO
+                            }
+                        })
+                        .setNegativeButton("n", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // TODO
+                            }
+                        });
+
+                builder.create().show();
             }
         });
 
