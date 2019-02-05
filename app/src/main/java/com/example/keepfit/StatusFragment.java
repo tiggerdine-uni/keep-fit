@@ -8,12 +8,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 public class StatusFragment extends Fragment {
 
+    int mTheRealLife = 0;
+    int mJustFantasy = 10000;
+    TextView mProgressTextView;
     ProgressWheel mWheel;
 
     @Override
@@ -25,39 +29,50 @@ public class StatusFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO refactor
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
 
-                builder.setView(inflater.inflate(R.layout.dialog_record, null))
-                        .setPositiveButton("y", new DialogInterface.OnClickListener() {
+                final View myView = inflater.inflate(R.layout.dialog_record, null);
+
+                builder.setView(myView)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // TODO
+                                EditText editText = myView.findViewById(R.id.edit_text);
+                                mTheRealLife += Integer.parseInt(editText.getText().toString());
+                                refresh();
                             }
                         })
-                        .setNegativeButton("n", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // TODO
                             }
                         });
-
                 builder.create().show();
             }
         });
 
-        mWheel = (ProgressWheel) view.findViewById(R.id.progress_wheel);
+        mProgressTextView = view.findViewById(R.id.progress_text_view);
 
-        float progress = 0.85f;
+        mWheel = view.findViewById(R.id.progress_wheel);
 
-        mWheel.setProgress(progress);
-
-        setBarColor(progress);
+        refresh();
 
         return view;
     }
 
+    // TODO refactor
+    private void refresh() {
+        float progress = (float) mTheRealLife / mJustFantasy;
+        if (progress > 1) {
+            progress = 1;
+        }
+        mProgressTextView.setText(Math.round(progress * 100) + "%");
+        setBarColor(progress);
+        mWheel.setProgress(progress);
+    }
+
+    // TODO refactor
     private void setBarColor(float progress) {
         switch ((int) Math.floor(progress * 10)) {
             case 0:

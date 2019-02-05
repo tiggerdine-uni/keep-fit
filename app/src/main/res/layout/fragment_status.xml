@@ -17,11 +17,11 @@
         wheel:matProg_linearProgress="true" />
 
     <TextView
+        android:id="@+id/progress_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="85%"
         android:textSize = "56sp" />
 
     <android.support.design.widget.FloatingActionButton
