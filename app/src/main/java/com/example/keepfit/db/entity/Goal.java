@@ -14,4 +14,10 @@ public class Goal {
     public int steps;
 
     public int visible;
+
+    public Goal(String name, int steps) {
+        this.name = name;
+        this.steps = steps;
+        visible = 1;
+    }
 }

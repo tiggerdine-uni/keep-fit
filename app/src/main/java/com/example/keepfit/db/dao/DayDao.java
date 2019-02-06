@@ -1,4 +1,7 @@
 package com.example.keepfit.db.dao;
 
-public class DayDao {
+import androidx.room.Dao;
+
+@Dao
+public interface DayDao {
 }
