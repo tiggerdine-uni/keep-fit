@@ -61,7 +61,7 @@ public class StatusFragment extends Fragment {
         return view;
     }
 
-    // TODO refactor
+    // TODO can we stop doing this?
     private void refresh() {
         float progress = (float) mTheRealLife / mJustFantasy;
         if (progress > 1) {
@@ -72,7 +72,6 @@ public class StatusFragment extends Fragment {
         mWheel.setProgress(progress);
     }
 
-    // TODO refactor
     private void setBarColor(float progress) {
         switch ((int) Math.floor(progress * 10)) {
             case 0:
