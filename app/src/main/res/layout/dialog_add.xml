@@ -5,10 +5,12 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/edit_text"
+        android:id="@+id/et"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:maxLength="5" />
+        android:maxLength="5" >
+        <requestFocus />
+    </EditText>
 
 </LinearLayout>

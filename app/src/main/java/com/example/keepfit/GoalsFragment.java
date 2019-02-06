@@ -25,8 +25,8 @@ public class GoalsFragment extends Fragment {
         for (Goal goal : goals) {
             s += goal.name + " " + goal.steps + "\n";
         }
-        TextView textView = view.findViewById(R.id.text_view);
-        textView.setText(s);
+        TextView tv = view.findViewById(R.id.tv);
+        tv.setText(s);
         return view;
     }
 
