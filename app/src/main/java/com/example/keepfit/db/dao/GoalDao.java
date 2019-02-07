@@ -26,4 +26,7 @@ public interface GoalDao {
 
     @Delete
     void delete(Goal goal);
+
+    @Query("DELETE FROM goal")
+    void nuke();
 }
