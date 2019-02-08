@@ -20,7 +20,7 @@ class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new StatusFragment();
         } else if (position == 1) {
-            return new GoalsFragment();
+            return new GoalFragment();
         } else {
             return new HistoryFragment();
         }
