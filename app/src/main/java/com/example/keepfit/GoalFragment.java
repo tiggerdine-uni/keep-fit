@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Goal;
@@ -25,37 +24,43 @@ import androidx.fragment.app.Fragment;
 
 public class GoalFragment extends Fragment {
 
-    List<Goal> goals;
+    private AppDatabase db;
+    private List<Goal> goals;
+    private InputMethodManager imm;
+    private View view;
+    private GoalAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_goal, container, false);
+        view = inflater.inflate(R.layout.fragment_goal, container, false);
 
-        final AppDatabase db = AppDatabase.getAppDatabase(getContext());
+        db = AppDatabase.getAppDatabase(getContext());
         populate(db);
-        goals = db.goalDao().loadAllGoals();
+        goals = db.goalDao().loadAllVisibleGoals();
 
-        final GoalAdapter adapter = new GoalAdapter(getActivity(), goals);
-        final ListView listView = rootView.findViewById(R.id.list);
-        listView.setAdapter(adapter);
+        adapter = new GoalAdapter(getActivity(), goals);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getContext(), "position " + position + ", id " + id, Toast.LENGTH_SHORT).show();
-            }
-        });
+        imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        FloatingActionButton fab = rootView.findViewById(R.id.goal_fab);
+        createListView();
+
+        createFloatingActionButton();
+
+        return view;
+    }
+
+    private void createFloatingActionButton() {
+        FloatingActionButton fab = view.findViewById(R.id.goal_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                View view1 = inflater.inflate(R.layout.dialog_new_goal, null);
-                final EditText nameEt = view1.findViewById(R.id.new_goal_name_et);
-                final EditText stepsEt = view1.findViewById(R.id.new_goal_steps_et);
-                final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                View view1 = inflater.inflate(R.layout.dialog_goal, null);
+                TextView goalTv = view1.findViewById(R.id.goal_tv);
+                goalTv.setText("New Goal");
+                final EditText nameEt = view1.findViewById(R.id.goal_name_et);
+                final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
                 builder.setView(view1)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -77,6 +82,8 @@ public class GoalFragment extends Fragment {
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
+
+                // TODO this is meant to control the behaviour of pressing enter on keyboard
                 alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                     @Override
                     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -96,16 +103,62 @@ public class GoalFragment extends Fragment {
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             }
         });
-
-        return rootView;
     }
 
+    private void createListView() {
+        final ListView listView = view.findViewById(R.id.list);
+        listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                final Goal clickedGoal = (Goal) adapterView.getItemAtPosition(position);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View view1 = inflater.inflate(R.layout.dialog_goal, null);
+                TextView goalTv = view1.findViewById(R.id.goal_tv);
+                goalTv.setText("Edit Goal");
+                final EditText nameEt = view1.findViewById(R.id.goal_name_et);
+                nameEt.setText(clickedGoal.name);
+                final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
+                stepsEt.setText("" + clickedGoal.steps);
+                builder.setView(view1)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // hide keyboard
+                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                clickedGoal.name = nameEt.getText().toString();
+                                clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
+                                db.goalDao().update(clickedGoal);
+                                adapter.clear();
+                                adapter.addAll(db.goalDao().loadAllGoals());
+                                adapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // hide keyboard
+                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            }
+                        });
+                final AlertDialog alertDialog = builder.create();
+                // TODO keyboard stuff
+                alertDialog.show();
+            }
+        });
+    }
 
     private void populate(AppDatabase db) {
         db.goalDao().nuke();
-        db.goalDao().insert(new Goal("Goal 1", 10000));
-        db.goalDao().insert(new Goal("Goal 2", 15000));
-        db.goalDao().insert(new Goal("Goal 3", 7500));
+        Goal goal1 = new Goal("Goal 1", 10000);
+        Goal goal2 = new Goal("Goal 2", 8000);
+        Goal goal3 = new Goal("Goal 3", 12500);
+        Goal goal4 = new Goal("Goal 4", 6500);
+        db.goalDao().insert(goal1);
+        db.goalDao().insert(goal2);
+        db.goalDao().insert(goal3);
+        db.goalDao().insert(goal4);
     }
 }
