@@ -9,26 +9,67 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.keepfit.db.AppDatabase;
+import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
+import java.util.List;
+
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class StatusFragment extends Fragment {
 
-    // TODO rename
-    int theRealLife = 0;
-    // TODO rename
-    int justFantasy = 10000;
+    private static StatusFragment instance = null;
+    int steps = 0;
+    TextView statusTv;
     TextView progressTextView;
     ProgressWheel wheel;
+    AppDatabase db;
+    List<Goal> goals;
+    ArrayAdapter spinnerArrayAdapter;
+    Spinner spinner;
+    Goal activeGoal;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        instance = this;
+    }
+
+    public static StatusFragment getInstance() {
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_status, container, false);
+        db = AppDatabase.getAppDatabase(getContext());
+        goals = db.goalDao().loadAllVisibleGoals();
+        spinner = view.findViewById(R.id.spinner);
+        spinnerArrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, goals);
+        spinner.setAdapter(spinnerArrayAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Goal selectedGoal = (Goal) spinner.getSelectedItem();
+                activeGoal = selectedGoal;
+                refresh();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        activeGoal = (Goal) spinner.getSelectedItem();
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +87,7 @@ public class StatusFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                theRealLife += Integer.parseInt(et.getText().toString());
+                                steps += Integer.parseInt(et.getText().toString());
                                 refresh();
                             }
                         })
@@ -75,16 +116,22 @@ public class StatusFragment extends Fragment {
             }
         });
         progressTextView = view.findViewById(R.id.progress_text_view);
+        statusTv = view.findViewById(R.id.status_tv);
         wheel = view.findViewById(R.id.progress_wheel);
         refresh();
         return view;
     }
 
-    private void refresh() {
-        float progress = (float) theRealLife / justFantasy;
+    public void refresh() {
+        goals.clear();
+        goals.addAll(db.goalDao().loadAllGoals());
+        spinnerArrayAdapter.notifyDataSetChanged();
+        activeGoal = (Goal) spinner.getSelectedItem();
+        float progress = (float) steps / activeGoal.steps;
         if (progress > 1) {
             progress = 1;
         }
+        statusTv.setText(steps + "/" + activeGoal.steps);
         progressTextView.setText((int) (progress * 100) + "%");
         setBarColor(progress);
         wheel.setProgress(progress);

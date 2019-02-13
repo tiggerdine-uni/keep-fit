@@ -20,4 +20,8 @@ public class Goal {
         this.steps = steps;
         visible = 1;
     }
+
+    public String toString() {
+        return name;
+    }
 }

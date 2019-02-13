@@ -20,10 +20,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class GoalFragment extends Fragment {
 
+    private AlertDialog.Builder builder;
+    private LayoutInflater inflater;
     private AppDatabase db;
     private List<Goal> goals;
     private InputMethodManager imm;
@@ -31,11 +34,17 @@ public class GoalFragment extends Fragment {
     private GoalAdapter adapter;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.inflater = inflater;
+        builder = new AlertDialog.Builder(getActivity());
         view = inflater.inflate(R.layout.fragment_goal, container, false);
 
         db = AppDatabase.getAppDatabase(getContext());
-        populate(db);
         goals = db.goalDao().loadAllVisibleGoals();
 
         adapter = new GoalAdapter(getActivity(), goals);
@@ -54,8 +63,6 @@ public class GoalFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                LayoutInflater inflater = getActivity().getLayoutInflater();
                 View view1 = inflater.inflate(R.layout.dialog_goal, null);
                 TextView goalTv = view1.findViewById(R.id.goal_tv);
                 goalTv.setText("New Goal");
@@ -72,6 +79,7 @@ public class GoalFragment extends Fragment {
                                 adapter.clear();
                                 adapter.addAll(db.goalDao().loadAllGoals());
                                 adapter.notifyDataSetChanged();
+                                StatusFragment.getInstance().refresh();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -113,8 +121,6 @@ public class GoalFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 final Goal clickedGoal = (Goal) adapterView.getItemAtPosition(position);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                LayoutInflater inflater = getActivity().getLayoutInflater();
                 View view1 = inflater.inflate(R.layout.dialog_goal, null);
                 TextView goalTv = view1.findViewById(R.id.goal_tv);
                 goalTv.setText("Edit Goal");
@@ -134,6 +140,7 @@ public class GoalFragment extends Fragment {
                                 adapter.clear();
                                 adapter.addAll(db.goalDao().loadAllGoals());
                                 adapter.notifyDataSetChanged();
+                                StatusFragment.getInstance().refresh();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -148,17 +155,5 @@ public class GoalFragment extends Fragment {
                 alertDialog.show();
             }
         });
-    }
-
-    private void populate(AppDatabase db) {
-        db.goalDao().nuke();
-        Goal goal1 = new Goal("Goal 1", 10000);
-        Goal goal2 = new Goal("Goal 2", 8000);
-        Goal goal3 = new Goal("Goal 3", 12500);
-        Goal goal4 = new Goal("Goal 4", 6500);
-        db.goalDao().insert(goal1);
-        db.goalDao().insert(goal2);
-        db.goalDao().insert(goal3);
-        db.goalDao().insert(goal4);
     }
 }
