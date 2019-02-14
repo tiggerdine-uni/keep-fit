@@ -3,4 +3,9 @@
     <string name="status">Status</string>
     <string name="goals">Goals</string>
     <string name="history">History</string>
+
+    <!-- Settings Menu Item [CHAR LIMIT=NONE] -->
+    <string name="settings_menu_item">Settings</string>
+    <!-- Settings Activity Title [CHAR LIMIT=NONE] -->
+    <string name="settings_title">Keep Fit Settings</string>
 </resources>

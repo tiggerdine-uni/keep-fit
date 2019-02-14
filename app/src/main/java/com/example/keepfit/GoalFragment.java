@@ -74,6 +74,7 @@ public class GoalFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                // TODO validate against 0 steps
                                 Goal goal = new Goal(nameEt.getText().toString(), Integer.parseInt(stepsEt.getText().toString()));
                                 db.goalDao().insert(goal);
                                 adapter.clear();
@@ -134,6 +135,7 @@ public class GoalFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                // TODO validate against 0 steps
                                 clickedGoal.name = nameEt.getText().toString();
                                 clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
                                 db.goalDao().update(clickedGoal);

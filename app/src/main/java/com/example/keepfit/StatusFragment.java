@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 public class StatusFragment extends Fragment {
 
     private static StatusFragment instance = null;
+    // TODO do all these things really need to be class variables?
     int steps = 0;
     TextView statusTv;
     TextView progressTextView;
@@ -76,9 +77,7 @@ public class StatusFragment extends Fragment {
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                // TODO rename
                 View view1 = inflater.inflate(R.layout.dialog_steps, null);
-                // TODO rename
                 final EditText et = view1.findViewById(R.id.et);
                 final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 builder.setView(view1)
