@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populate(AppDatabase db) {
-//        db.goalDao().nuke();
+        db.goalDao().nuke();
 //        Goal goal1 = new Goal("Goal 1", 10000);
 //        Goal goal2 = new Goal("Goal 2", 8000);
 //        Goal goal3 = new Goal("Goal 3", 12500);

@@ -43,7 +43,6 @@ public class StatusFragment extends Fragment {
     ArrayAdapter spinnerArrayAdapter;
     Spinner spinner;
     Goal activeGoal;
-    boolean check;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,16 +62,9 @@ public class StatusFragment extends Fragment {
         spinner = view.findViewById(R.id.spinner);
         spinnerArrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, goals);
         spinner.setAdapter(spinnerArrayAdapter);
-        check = false;
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (check == false) {
-                    Toast.makeText(getContext(), "not doing it", Toast.LENGTH_SHORT).show();
-                    check = true;
-                } else {
-                    Toast.makeText(getContext(), "doing it", Toast.LENGTH_SHORT).show();
-
                     Goal selectedGoal = (Goal) spinner.getSelectedItem();
                     SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
@@ -80,8 +72,6 @@ public class StatusFragment extends Fragment {
                     editor.commit();
                     Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
                     refresh();
-                }
-
             }
 
             @Override
@@ -148,15 +138,19 @@ public class StatusFragment extends Fragment {
         int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
         Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
         activeGoal = AppDatabase.getAppDatabase(getContext()).goalDao().findGoalWithId(activeGoalId);
-        spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
-        float progress = (float) steps / activeGoal.steps;
-        if (progress > 1) {
-            progress = 1;
+        if (activeGoal == null) {
+            statusTv.setText("No goals.");
+        } else {
+            spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
+            float progress = (float) steps / activeGoal.steps;
+            if (progress > 1) {
+                progress = 1;
+            }
+            statusTv.setText(steps + "/" + activeGoal.steps);
+            progressTextView.setText((int) (progress * 100) + "%");
+            setBarColor(progress);
+            wheel.setProgress(progress);
         }
-        statusTv.setText(steps + "/" + activeGoal.steps);
-        progressTextView.setText((int) (progress * 100) + "%");
-        setBarColor(progress);
-        wheel.setProgress(progress);
     }
 
     private void setBarColor(float progress) {
