@@ -16,8 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
+import com.example.keepfit.db.dao.GoalDao;
 import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
@@ -31,6 +33,7 @@ public class StatusFragment extends Fragment {
 
     private static StatusFragment instance = null;
     // TODO do all these things really need to be class variables?
+    // TODO this resets steps every time we come back from settingsactivity
     int steps = 0;
     TextView statusTv;
     TextView progressTextView;
@@ -40,6 +43,7 @@ public class StatusFragment extends Fragment {
     ArrayAdapter spinnerArrayAdapter;
     Spinner spinner;
     Goal activeGoal;
+    boolean check;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,16 +63,25 @@ public class StatusFragment extends Fragment {
         spinner = view.findViewById(R.id.spinner);
         spinnerArrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, goals);
         spinner.setAdapter(spinnerArrayAdapter);
+        check = false;
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Goal selectedGoal = (Goal) spinner.getSelectedItem();
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
-                editor.commit();
-                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
-                refresh();
+                if (check == false) {
+                    Toast.makeText(getContext(), "not doing it", Toast.LENGTH_SHORT).show();
+                    check = true;
+                } else {
+                    Toast.makeText(getContext(), "doing it", Toast.LENGTH_SHORT).show();
+
+                    Goal selectedGoal = (Goal) spinner.getSelectedItem();
+                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
+                    editor.commit();
+                    Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
+                    refresh();
+                }
+
             }
 
             @Override
@@ -131,7 +144,11 @@ public class StatusFragment extends Fragment {
         goals.clear();
         goals.addAll(db.goalDao().loadAllGoals());
         spinnerArrayAdapter.notifyDataSetChanged();
-        activeGoal = (Goal) spinner.getSelectedItem();
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
+        Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
+        activeGoal = AppDatabase.getAppDatabase(getContext()).goalDao().findGoalWithId(activeGoalId);
+        spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
         float progress = (float) steps / activeGoal.steps;
         if (progress > 1) {
             progress = 1;

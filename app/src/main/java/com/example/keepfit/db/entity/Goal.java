@@ -1,5 +1,6 @@
 package com.example.keepfit.db.entity;
 
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -23,5 +24,18 @@ public class Goal {
 
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(((Goal) obj).goalId == goalId) {
+            return true;
+        }
+        return false;
     }
 }

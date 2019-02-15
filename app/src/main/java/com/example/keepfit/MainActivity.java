@@ -52,14 +52,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populate(AppDatabase db) {
-        db.goalDao().nuke();
-        Goal goal1 = new Goal("Goal 1", 10000);
-        Goal goal2 = new Goal("Goal 2", 8000);
-        Goal goal3 = new Goal("Goal 3", 12500);
-        Goal goal4 = new Goal("Goal 4", 6500);
-        db.goalDao().insert(goal1);
-        db.goalDao().insert(goal2);
-        db.goalDao().insert(goal3);
-        db.goalDao().insert(goal4);
+//        db.goalDao().nuke();
+//        Goal goal1 = new Goal("Goal 1", 10000);
+//        Goal goal2 = new Goal("Goal 2", 8000);
+//        Goal goal3 = new Goal("Goal 3", 12500);
+//        Goal goal4 = new Goal("Goal 4", 6500);
+//        db.goalDao().insert(goal1);
+//        db.goalDao().insert(goal2);
+//        db.goalDao().insert(goal3);
+//        db.goalDao().insert(goal4);
     }
 }
