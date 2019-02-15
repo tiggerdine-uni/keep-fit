@@ -13,7 +13,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-@Database(entities = {Day.class, Goal.class}, version = 1, exportSchema = false)
+@Database(entities = {Day.class, Goal.class}, version = 2, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -22,7 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class,
-                    "goal-database").allowMainThreadQueries().build();
+                    "goal-database").allowMainThreadQueries().fallbackToDestructiveMigration().build();
         }
         return INSTANCE;
     }

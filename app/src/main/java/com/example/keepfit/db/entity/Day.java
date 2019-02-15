@@ -7,10 +7,10 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Day {
-    @PrimaryKey(autoGenerate = true)
-    public int dayId;
-
+    @PrimaryKey
     public Date date;
+
+    public int steps;
 
     public int goalId;
 }
