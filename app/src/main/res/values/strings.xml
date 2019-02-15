@@ -8,4 +8,11 @@
     <string name="settings_menu_item">Settings</string>
     <!-- Settings Activity Title [CHAR LIMIT=NONE] -->
     <string name="settings_title">Keep Fit Settings</string>
+    <string name="settings_goal_editing_key">goal_editing</string>
+    <string name="settings_historic_activity_recording_key">historic_activity_recording</string>
+    <string name="settings_notifications_key">notifications</string>
+    <string name="settings_step_counter_key">step_counter</string>
+    <string name="toast_goal_editing_disabled">Enable goal editing to edit goals.</string>
+    <string name="active_goal_id_key">active_goal_id</string>
+    <string name="toast_cannot_edit">Cannot edit active goal.</string>
 </resources>

@@ -18,6 +18,9 @@ public interface GoalDao {
     @Query("SELECT * FROM goal WHERE visible = 1")
     List<Goal> loadAllVisibleGoals();
 
+    @Query("SELECT * FROM goal WHERE goalId = :id")
+    Goal findGoalWithId(int id);
+
     @Insert
     void insert(Goal goal);
 

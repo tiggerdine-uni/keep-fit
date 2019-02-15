@@ -3,7 +3,10 @@ package com.example.keepfit;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Goal;
@@ -121,40 +125,53 @@ public class GoalFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                final Goal clickedGoal = (Goal) adapterView.getItemAtPosition(position);
-                View view1 = inflater.inflate(R.layout.dialog_goal, null);
-                TextView goalTv = view1.findViewById(R.id.goal_tv);
-                goalTv.setText("Edit Goal");
-                final EditText nameEt = view1.findViewById(R.id.goal_name_et);
-                nameEt.setText(clickedGoal.name);
-                final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
-                stepsEt.setText("" + clickedGoal.steps);
-                builder.setView(view1)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                // TODO validate against 0 steps
-                                clickedGoal.name = nameEt.getText().toString();
-                                clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
-                                db.goalDao().update(clickedGoal);
-                                adapter.clear();
-                                adapter.addAll(db.goalDao().loadAllGoals());
-                                adapter.notifyDataSetChanged();
-                                StatusFragment.getInstance().refresh();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                            }
-                        });
-                final AlertDialog alertDialog = builder.create();
-                // TODO keyboard stuff
-                alertDialog.show();
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                Boolean goalEditing = sharedPrefs.getBoolean(getString(R.string.settings_goal_editing_key), true);
+                if (!goalEditing) {
+                    Toast.makeText(getContext(), R.string.toast_goal_editing_disabled, Toast.LENGTH_SHORT).show();
+                } else {
+                    final Goal clickedGoal = (Goal) adapterView.getItemAtPosition(position);
+                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                    int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
+                    Log.v("StatusFragment", "getting id " + activeGoalId);
+                    if (clickedGoal.goalId == activeGoalId) {
+                        Toast.makeText(getContext(), R.string.toast_cannot_edit, Toast.LENGTH_SHORT).show();
+                    } else {
+                        View view1 = inflater.inflate(R.layout.dialog_goal, null);
+                        TextView goalTv = view1.findViewById(R.id.goal_tv);
+                        goalTv.setText("Edit Goal");
+                        final EditText nameEt = view1.findViewById(R.id.goal_name_et);
+                        nameEt.setText(clickedGoal.name);
+                        final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
+                        stepsEt.setText("" + clickedGoal.steps);
+                        builder.setView(view1)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // hide keyboard
+                                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                        // TODO validate against 0 steps
+                                        clickedGoal.name = nameEt.getText().toString();
+                                        clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
+                                        db.goalDao().update(clickedGoal);
+                                        adapter.clear();
+                                        adapter.addAll(db.goalDao().loadAllGoals());
+                                        adapter.notifyDataSetChanged();
+                                        StatusFragment.getInstance().refresh();
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // hide keyboard
+                                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                    }
+                                });
+                        final AlertDialog alertDialog = builder.create();
+                        // TODO keyboard stuff
+                        alertDialog.show();
+                    }
+                }
             }
         });
     }

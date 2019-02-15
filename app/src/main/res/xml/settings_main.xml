@@ -4,9 +4,31 @@
     android:title="@string/settings_title">
 
     <CheckBoxPreference
-        android:summary="Goal Editing"/>
+        android:defaultValue="true"
+        android:key="@string/settings_goal_editing_key"
+        android:title="Goal Editing"
+        android:summaryOn="Enabled"
+        android:summaryOff="Disabled" />
 
     <SwitchPreference
-        android:summary="Historic Activity Recording"/>
+        android:title="Historic Activity Recording"
+        android:key="@string/settings_historic_activity_recording_key"
+        android:summaryOn="Enabled"
+        android:summaryOff="Disabled"
+        android:defaultValue="true"/>
+
+    <CheckBoxPreference
+        android:title="Notifications"
+        android:key="@string/settings_notifications_key"
+        android:summaryOn="On"
+        android:summaryOff="Off"
+        android:defaultValue="false"/>
+
+    <SwitchPreference
+        android:title="Step Counter"
+        android:key="@string/settings_step_counter_key"
+        android:summaryOn="Enabled"
+        android:summaryOff="Disabled"
+        android:defaultValue="false"/>
 
 </PreferenceScreen>

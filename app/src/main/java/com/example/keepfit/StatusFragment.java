@@ -3,7 +3,9 @@ package com.example.keepfit;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +63,11 @@ public class StatusFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Goal selectedGoal = (Goal) spinner.getSelectedItem();
-                activeGoal = selectedGoal;
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
+                editor.commit();
+                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
                 refresh();
             }
 
