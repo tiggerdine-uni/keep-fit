@@ -160,11 +160,22 @@ public class GoalFragment extends Fragment {
                                         StatusFragment.getInstance().refresh();
                                     }
                                 })
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
                                         // hide keyboard
                                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                    }
+                                })
+                                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // TODO maybe confirm?
+                                        db.goalDao().delete(clickedGoal);
+                                        adapter.clear();
+                                        adapter.addAll(db.goalDao().loadAllGoals());
+                                        adapter.notifyDataSetChanged();
+                                        StatusFragment.getInstance().refresh();
                                     }
                                 });
                         final AlertDialog alertDialog = builder.create();
