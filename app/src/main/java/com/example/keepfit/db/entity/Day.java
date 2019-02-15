@@ -13,4 +13,9 @@ public class Day {
     public int steps;
 
     public int goalId;
+
+    public Day(Date date, int steps) {
+        this.date = date;
+        this.steps = steps;
+    }
 }

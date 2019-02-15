@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,10 +21,13 @@ import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.dao.GoalDao;
+import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -34,7 +38,6 @@ public class StatusFragment extends Fragment {
     private static StatusFragment instance = null;
     // TODO do all these things really need to be class variables?
     // TODO this resets steps every time we come back from settingsactivity
-    int steps = 0;
     TextView statusTv;
     TextView progressTextView;
     ProgressWheel wheel;
@@ -95,7 +98,16 @@ public class StatusFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                steps += Integer.parseInt(et.getText().toString());
+                                Date date = getDate();
+                                Day today = db.dayDao().findDayWithDate(date);
+                                int addSteps = Integer.parseInt(et.getText().toString());
+                                if(today == null) {
+                                    db.dayDao().insert(new Day(date, addSteps));
+                                } else {
+                                    today.steps += addSteps;
+                                    db.dayDao().update(today);
+                                }
+                                // steps += Integer.parseInt(et.getText().toString());
                                 refresh();
                             }
                         })
@@ -136,12 +148,21 @@ public class StatusFragment extends Fragment {
         spinnerArrayAdapter.notifyDataSetChanged();
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
-        Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
-        activeGoal = AppDatabase.getAppDatabase(getContext()).goalDao().findGoalWithId(activeGoalId);
+        // Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
+        AppDatabase db = AppDatabase.getAppDatabase(getContext());
+        activeGoal = db.goalDao().findGoalWithId(activeGoalId);
         if (activeGoal == null) {
             statusTv.setText("No goals.");
         } else {
             spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
+            Date date = getDate();
+            Day today = db.dayDao().findDayWithDate(date);
+            int steps;
+            if (today == null) {
+                steps = 0;
+            } else {
+                steps = today.steps;
+            }
             float progress = (float) steps / activeGoal.steps;
             if (progress > 1) {
                 progress = 1;
@@ -151,6 +172,15 @@ public class StatusFragment extends Fragment {
             setBarColor(progress);
             wheel.setProgress(progress);
         }
+    }
+
+    private Date getDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
     private void setBarColor(float progress) {
