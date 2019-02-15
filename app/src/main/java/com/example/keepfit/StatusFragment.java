@@ -98,7 +98,7 @@ public class StatusFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                Date date = getDate();
+                                Date date = Utils.getDay();
                                 Day today = db.dayDao().findDayWithDate(date);
                                 int addSteps = Integer.parseInt(et.getText().toString());
                                 if(today == null) {
@@ -155,7 +155,7 @@ public class StatusFragment extends Fragment {
             statusTv.setText("No goals.");
         } else {
             spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
-            Date date = getDate();
+            Date date = Utils.getDay();
             Day today = db.dayDao().findDayWithDate(date);
             int steps;
             if (today == null) {
@@ -172,15 +172,6 @@ public class StatusFragment extends Fragment {
             setBarColor(progress);
             wheel.setProgress(progress);
         }
-    }
-
-    private Date getDate() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY,0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
     }
 
     private void setBarColor(float progress) {
