@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Day;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import androidx.fragment.app.Fragment;
@@ -21,7 +22,8 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         DatePicker datePicker = view.findViewById(R.id.date_picker);
-        datePicker.init(2018, 2, 9, new DatePicker.OnDateChangedListener() {
+        Calendar cal = Calendar.getInstance();
+        datePicker.init(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 // Log.v("HistoryFragment", "year = " + year + ", monthOfYear = " + monthOfYear + ", dayOfMonth = " + dayOfMonth);
