@@ -45,4 +45,9 @@
         android:src="@drawable/baseline_directions_walk_white_36"
         app:maxImageSize="36dp" />
 
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/viewKonfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

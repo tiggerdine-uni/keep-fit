@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         AppDatabase db = AppDatabase.getAppDatabase(this);
         populate(db);
+        db.dayDao().nuke();
 
         setContentView(R.layout.activity_main);
 

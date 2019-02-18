@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -32,6 +33,9 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 
 public class StatusFragment extends Fragment {
 
@@ -40,6 +44,7 @@ public class StatusFragment extends Fragment {
     // TODO this resets steps every time we come back from settingsactivity
     TextView statusTv;
     TextView progressTextView;
+    KonfettiView viewKonfetti;
     ProgressWheel wheel;
     AppDatabase db;
     List<Goal> goals;
@@ -138,6 +143,7 @@ public class StatusFragment extends Fragment {
         progressTextView = view.findViewById(R.id.progress_text_view);
         statusTv = view.findViewById(R.id.status_tv);
         wheel = view.findViewById(R.id.progress_wheel);
+        viewKonfetti = view.findViewById(R.id.viewKonfetti);
         refresh();
         return view;
     }
@@ -164,8 +170,21 @@ public class StatusFragment extends Fragment {
                 steps = today.steps;
             }
             float progress = (float) steps / activeGoal.steps;
-            if (progress > 1) {
+            if (progress >= 1) {
                 progress = 1;
+
+                // TODO don't do this exactly here
+                viewKonfetti.build()
+                        // TODO don't hardcode these colors
+                        .addColors(Color.parseColor("#fa1434"), Color.parseColor("#48ba2d"), Color.parseColor("#1899dd"))
+                        .setDirection(0.0, 359.0)
+                        .setSpeed(1f, 5f)
+                        .setFadeOutEnabled(true)
+                        .setTimeToLive(2000L)
+                        .addShapes(Shape.RECT, Shape.CIRCLE)
+                        .addSizes(new Size(12, 5))
+                        .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                        .streamFor(300, 5000L);
             }
             statusTv.setText(steps + "/" + activeGoal.steps);
             progressTextView.setText((int) (progress * 100) + "%");
