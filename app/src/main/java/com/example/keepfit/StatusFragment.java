@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -18,16 +17,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
-import com.example.keepfit.db.dao.GoalDao;
 import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -94,10 +90,10 @@ public class StatusFragment extends Fragment {
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                View view1 = inflater.inflate(R.layout.dialog_steps, null);
-                final EditText et = view1.findViewById(R.id.et);
+                View dialogView = inflater.inflate(R.layout.dialog_steps, null);
+                final EditText et = dialogView.findViewById(R.id.et);
                 final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                builder.setView(view1)
+                builder.setView(dialogView)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {

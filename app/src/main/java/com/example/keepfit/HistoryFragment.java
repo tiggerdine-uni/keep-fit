@@ -1,12 +1,12 @@
 package com.example.keepfit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
-import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Day;
@@ -31,11 +31,26 @@ public class HistoryFragment extends Fragment {
                 // Log.v("HistoryFragment", "date = " + date);
                 AppDatabase db = AppDatabase.getAppDatabase(getContext());
                 Day day = db.dayDao().findDayWithDate(date);
-                if (day != null) {
-                    Toast.makeText(getContext(), "You walked " + day.steps + " steps on " + date.toString() + ".", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "No activity recorded on " + date + ".", Toast.LENGTH_SHORT).show();
-                }
+//                if (day != null) {
+//                    Toast.makeText(getContext(), "You walked " + day.steps + " steps on " + date.toString() + ".", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    Toast.makeText(getContext(), "No activity recorded on " + date + ".", Toast.LENGTH_SHORT).show();
+//                }
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                final LayoutInflater inflater = getActivity().getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_history, null);
+                builder.setView(dialogView).setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                        View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
+                        builder2.setView(stepsDialogView);
+                        AlertDialog stepsDialog = builder2.create();
+                        stepsDialog.show();
+                    }
+                });
+                AlertDialog historyDialog = builder.create();
+                historyDialog.show();
             }
         });
         return view;
