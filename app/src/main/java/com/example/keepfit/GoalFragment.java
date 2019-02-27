@@ -173,9 +173,12 @@ public class GoalFragment extends Fragment {
                                     public void onClick(DialogInterface dialog, int which) {
                                         // TODO maybe confirm?
                                         if(safeToDelete(clickedGoal)) {
+                                            // Log.v("delete", "clicked goal is safe to delete");
                                             db.goalDao().delete(clickedGoal);
                                         } else {
+                                            // Log.v("delete", "clicked goal is not safe to delete");
                                             clickedGoal.visible = 0;
+                                            db.goalDao().update(clickedGoal);
                                         }
                                         adapter.clear();
                                         adapter.addAll(db.goalDao().loadAllVisibleGoals());
@@ -194,8 +197,9 @@ public class GoalFragment extends Fragment {
 
     private boolean safeToDelete(Goal clickedGoal) {
         List<Day> matches = db.dayDao().findDaysWithGoal(clickedGoal.goalId);
-        if (goals.isEmpty()) {
-            return true; }
+        if (matches.isEmpty()) {
+            return true;
+        }
         return false;
     }
 }
