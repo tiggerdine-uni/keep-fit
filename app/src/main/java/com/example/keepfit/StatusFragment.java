@@ -75,8 +75,7 @@ public class StatusFragment extends Fragment {
                     editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
                     editor.commit();
                     Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
-                    Date date = Utils.getDay();
-                    Day today = db.dayDao().findDayWithDate(date);
+                    Day today = today();
                     today.goalId = selectedGoal.goalId;
                     db.dayDao().update(today);
                     refresh();
@@ -146,6 +145,15 @@ public class StatusFragment extends Fragment {
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
         refresh();
         return view;
+    }
+
+    private Day today() {
+        Date date = Utils.getDay();
+        Day today = db.dayDao().findDayWithDate(date);
+        if (today == null) {
+            db.dayDao().insert(new Day(date, 0));
+        }
+        return db.dayDao().findDayWithDate(date);
     }
 
     public void refresh() {

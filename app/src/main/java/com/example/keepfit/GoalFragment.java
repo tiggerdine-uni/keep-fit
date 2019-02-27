@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
+import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -82,7 +83,7 @@ public class GoalFragment extends Fragment {
                                 Goal goal = new Goal(nameEt.getText().toString(), Integer.parseInt(stepsEt.getText().toString()));
                                 db.goalDao().insert(goal);
                                 adapter.clear();
-                                adapter.addAll(db.goalDao().loadAllGoals());
+                                adapter.addAll(db.goalDao().loadAllVisibleGoals());
                                 adapter.notifyDataSetChanged();
                                 StatusFragment.getInstance().refresh();
                             }
@@ -155,7 +156,7 @@ public class GoalFragment extends Fragment {
                                         clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
                                         db.goalDao().update(clickedGoal);
                                         adapter.clear();
-                                        adapter.addAll(db.goalDao().loadAllGoals());
+                                        adapter.addAll(db.goalDao().loadAllVisibleGoals());
                                         adapter.notifyDataSetChanged();
                                         StatusFragment.getInstance().refresh();
                                     }
@@ -171,9 +172,13 @@ public class GoalFragment extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         // TODO maybe confirm?
-                                        db.goalDao().delete(clickedGoal);
+                                        if(safeToDelete(clickedGoal)) {
+                                            db.goalDao().delete(clickedGoal);
+                                        } else {
+                                            clickedGoal.visible = 0;
+                                        }
                                         adapter.clear();
-                                        adapter.addAll(db.goalDao().loadAllGoals());
+                                        adapter.addAll(db.goalDao().loadAllVisibleGoals());
                                         adapter.notifyDataSetChanged();
                                         StatusFragment.getInstance().refresh();
                                     }
@@ -185,5 +190,12 @@ public class GoalFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private boolean safeToDelete(Goal clickedGoal) {
+        List<Day> matches = db.dayDao().findDaysWithGoal(clickedGoal.goalId);
+        if (goals.isEmpty()) {
+            return true; }
+        return false;
     }
 }

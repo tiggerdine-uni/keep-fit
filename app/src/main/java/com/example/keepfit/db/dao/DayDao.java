@@ -4,6 +4,7 @@ import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 
 import java.util.Date;
+import java.util.List;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -23,4 +24,7 @@ public interface DayDao {
 
     @Update
     void update(Day today);
+
+    @Query("SELECT * FROM day WHERE goalId = :id")
+    List<Day> findDaysWithGoal(int id);
 }

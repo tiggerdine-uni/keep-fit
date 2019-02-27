@@ -43,14 +43,19 @@ public class HistoryFragment extends Fragment {
                 View dialogView = inflater.inflate(R.layout.dialog_history, null);
                 TextView historyTextView = dialogView.findViewById(R.id.history_text_view);
 
-                //  TODO handle no day in database yet (make it)
+                // TODO make it so you can't click future dates - set max date? other way?
 
-                Goal goal = db.goalDao().findGoalWithId(day.goalId);
-
-                // TODO handle no goal set
-
-                // TODO reword some of these
-                historyTextView.setText("Goal: " + goal.name +  "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + day.steps / goal.steps);
+                if (day == null) {
+                    historyTextView.setText("No activity recorded on this day.");
+                } else {
+                    Goal goal = db.goalDao().findGoalWithId(day.goalId);
+                    if (goal == null) {
+                        historyTextView.setText("Goal: None\nSteps: " + day.steps);
+                    } else {
+                        // TODO reword some of these
+                        historyTextView.setText("Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (day.steps / goal.steps * 100) + " %");
+                    }
+                }
                 builder.setView(dialogView).setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
