@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+import android.widget.TextView;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Day;
+import com.example.keepfit.db.entity.Goal;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +41,16 @@ public class HistoryFragment extends Fragment {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 final LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_history, null);
+                TextView historyTextView = dialogView.findViewById(R.id.history_text_view);
+
+                //  TODO handle no day in database yet (make it)
+
+                Goal goal = db.goalDao().findGoalWithId(day.goalId);
+
+                // TODO handle no goal set
+
+                // TODO reword some of these
+                historyTextView.setText("Goal: " + goal.name +  "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + day.steps / goal.steps);
                 builder.setView(dialogView).setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {

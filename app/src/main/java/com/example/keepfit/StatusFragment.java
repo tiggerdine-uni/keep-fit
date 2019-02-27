@@ -75,6 +75,10 @@ public class StatusFragment extends Fragment {
                     editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
                     editor.commit();
                     Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
+                    Date date = Utils.getDay();
+                    Day today = db.dayDao().findDayWithDate(date);
+                    today.goalId = selectedGoal.goalId;
+                    db.dayDao().update(today);
                     refresh();
             }
 
