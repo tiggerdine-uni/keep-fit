@@ -24,6 +24,8 @@ import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Date;
 import java.util.List;
 
@@ -37,16 +39,15 @@ public class StatusFragment extends Fragment {
 
     private static StatusFragment instance = null;
     // TODO do all these things really need to be class variables?
-    // TODO this resets steps every time we come back from settingsactivity
-    TextView statusTv;
-    TextView progressTextView;
-    KonfettiView viewKonfetti;
-    ProgressWheel wheel;
-    AppDatabase db;
-    List<Goal> goals;
-    ArrayAdapter spinnerArrayAdapter;
-    Spinner spinner;
-    Goal activeGoal;
+    private TextView statusTv;
+    private TextView progressTextView;
+    private KonfettiView viewKonfetti;
+    private ProgressWheel wheel;
+    private AppDatabase db;
+    private List<Goal> goals;
+    private ArrayAdapter spinnerArrayAdapter;
+    private Spinner spinner;
+    private Goal activeGoal;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,12 +55,12 @@ public class StatusFragment extends Fragment {
         instance = this;
     }
 
-    public static StatusFragment getInstance() {
+    static StatusFragment getInstance() {
         return instance;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_status, container, false);
         db = AppDatabase.getAppDatabase(getContext());
         goals = db.goalDao().loadAllVisibleGoals();
@@ -156,7 +157,7 @@ public class StatusFragment extends Fragment {
         return db.dayDao().findDayWithDate(date);
     }
 
-    public void refresh() {
+    void refresh() {
         goals.clear();
         goals.addAll(db.goalDao().loadAllGoals());
         spinnerArrayAdapter.notifyDataSetChanged();
@@ -194,8 +195,10 @@ public class StatusFragment extends Fragment {
                         .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
                         .streamFor(300, 5000L);
             }
-            statusTv.setText(steps + "/" + activeGoal.steps);
-            progressTextView.setText((int) (progress * 100) + "%");
+            String statusText = steps + "/" + activeGoal.steps;
+            statusTv.setText(statusText);
+            String progressText = (int) (progress * 100) + "%";
+            progressTextView.setText(progressText);
             setBarColor(progress);
             wheel.setProgress(progress);
         }

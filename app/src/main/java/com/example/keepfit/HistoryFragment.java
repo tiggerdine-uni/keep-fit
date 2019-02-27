@@ -45,17 +45,19 @@ public class HistoryFragment extends Fragment {
 
                 // TODO make it so you can't click future dates - set max date? other way?
 
+                String historyText = "";
                 if (day == null) {
-                    historyTextView.setText("No activity recorded on this day.");
+                    historyText = "No activity recorded on this day.";
                 } else {
                     Goal goal = db.goalDao().findGoalWithId(day.goalId);
                     if (goal == null) {
-                        historyTextView.setText("Goal: None\nSteps: " + day.steps);
+                        historyText = "Goal: None\nSteps: " + day.steps;
                     } else {
                         // TODO reword some of these
-                        historyTextView.setText("Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (day.steps / goal.steps * 100) + " %");
+                        historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (day.steps / goal.steps * 100) + " %";
                     }
                 }
+                historyTextView.setText(historyText);
                 builder.setView(dialogView).setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
