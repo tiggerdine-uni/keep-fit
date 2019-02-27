@@ -54,7 +54,11 @@ public class HistoryFragment extends Fragment {
                         historyText = "Goal: None\nSteps: " + day.steps;
                     } else {
                         // TODO reword some of these
-                        historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (day.steps / goal.steps * 100) + " %";
+                        float proportion = (float) day.steps / goal.steps;
+                        if (proportion > 1)
+                                proportion = 1;
+
+                        historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
                     }
                 }
                 historyTextView.setText(historyText);
