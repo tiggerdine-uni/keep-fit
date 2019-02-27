@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.keepfit.db.AppDatabase;
@@ -29,10 +30,10 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 // Log.v("HistoryFragment", "year = " + year + ", monthOfYear = " + monthOfYear + ", dayOfMonth = " + dayOfMonth);
-                Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                final Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
                 // Log.v("HistoryFragment", "date = " + date);
-                AppDatabase db = AppDatabase.getAppDatabase(getContext());
-                Day day = db.dayDao().findDayWithDate(date);
+                final AppDatabase db = AppDatabase.getAppDatabase(getContext());
+                final Day day = db.dayDao().findDayWithDate(date);
 //                if (day != null) {
 //                    Toast.makeText(getContext(), "You walked " + day.steps + " steps on " + date.toString() + ".", Toast.LENGTH_SHORT).show();
 //                } else {
@@ -51,25 +52,55 @@ public class HistoryFragment extends Fragment {
                 } else {
                     Goal goal = db.goalDao().findGoalWithId(day.goalId);
                     if (goal == null) {
+                        // TODO also display the date...
                         historyText = "Goal: None\nSteps: " + day.steps;
                     } else {
                         // TODO reword some of these
                         float proportion = (float) day.steps / goal.steps;
                         if (proportion > 1)
                                 proportion = 1;
-
+                        // TODO ... and here too
                         historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
                     }
                 }
                 historyTextView.setText(historyText);
-                builder.setView(dialogView).setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
+                builder.setView(dialogView)
+                        .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
                         View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
-                        builder2.setView(stepsDialogView);
+                        final EditText et = stepsDialogView.findViewById(R.id.et);
+                        // TODO also show the date here
+                        builder2.setView(stepsDialogView)
+                                .setPositiveButton("POS", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        int addSteps = Integer.parseInt(et.getText().toString());
+                                        if(day == null) {
+                                            db.dayDao().insert(new Day(date, addSteps));
+                                        } else {
+                                            day.steps += addSteps;
+                                            db.dayDao().update(day);
+                                        }
+                                        StatusFragment statusFragment = StatusFragment.getInstance();
+                                        statusFragment.refresh();
+                                    }
+                                })
+                                .setNegativeButton("NEG", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
                         AlertDialog stepsDialog = builder2.create();
                         stepsDialog.show();
+                    }
+                })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
                     }
                 });
                 AlertDialog historyDialog = builder.create();

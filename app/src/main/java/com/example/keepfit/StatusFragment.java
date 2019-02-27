@@ -159,7 +159,7 @@ public class StatusFragment extends Fragment {
 
     void refresh() {
         goals.clear();
-        goals.addAll(db.goalDao().loadAllGoals());
+        goals.addAll(db.goalDao().loadAllVisibleGoals());
         spinnerArrayAdapter.notifyDataSetChanged();
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
