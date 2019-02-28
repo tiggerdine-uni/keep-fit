@@ -105,14 +105,11 @@ public class StatusFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_steps, null);
                 final EditText et = dialogView.findViewById(R.id.et);
-                final InputMethodManager imm = (InputMethodManager)
-                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 builder.setView(dialogView)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                Keyboard.hide(getContext());
                                 Date date = Utils.getDay();
                                 Day today = db.dayDao().findDayWithDate(date);
                                 int addSteps = Integer.parseInt(et.getText().toString());
@@ -135,8 +132,7 @@ public class StatusFragment extends Fragment {
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY,0);
+                                Keyboard.hide(getContext());
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
@@ -153,8 +149,7 @@ public class StatusFragment extends Fragment {
                 });
                 alertDialog.show();
                 et.requestFocus();
-                // show keyboard
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                Keyboard.show(getContext());
             }
         });
 
@@ -170,6 +165,8 @@ public class StatusFragment extends Fragment {
         //
         return view;
     }
+
+
 
     /**
      *

@@ -3,6 +3,7 @@ package com.example.keepfit;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +30,9 @@ public class HistoryFragment extends Fragment {
         datePicker.init(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // Log.v("HistoryFragment", "year = " + year + ", monthOfYear = " + monthOfYear + ", dayOfMonth = " + dayOfMonth);
+//                Log.v("HistoryFragment", "year = " + year + ", monthOfYear = " + monthOfYear + ", dayOfMonth = " + dayOfMonth);
                 final Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
-                // Log.v("HistoryFragment", "date = " + date);
+//                Log.v("HistoryFragment", "date = " + date);
                 final AppDatabase db = AppDatabase.getAppDatabase(getContext());
                 final Day day = db.dayDao().findDayWithDate(date);
 //                if (day != null) {
@@ -76,6 +77,7 @@ public class HistoryFragment extends Fragment {
                                 .setPositiveButton("POS", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        Keyboard.hide(getContext());
                                         int addSteps = Integer.parseInt(et.getText().toString());
                                         if(day == null) {
                                             db.dayDao().insert(new Day(date, addSteps));
@@ -90,11 +92,12 @@ public class HistoryFragment extends Fragment {
                                 .setNegativeButton("NEG", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-
+                                        Keyboard.hide(getContext());
                                     }
                                 });
                         AlertDialog stepsDialog = builder2.create();
                         stepsDialog.show();
+                        Keyboard.show(getContext());
                     }
                 })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

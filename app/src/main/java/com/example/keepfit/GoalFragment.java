@@ -34,7 +34,6 @@ public class GoalFragment extends Fragment {
     private LayoutInflater inflater;
     private AppDatabase db;
     private List<Goal> goals;
-    private InputMethodManager imm;
     private View view;
     private GoalAdapter adapter;
 
@@ -53,8 +52,6 @@ public class GoalFragment extends Fragment {
         goals = db.goalDao().loadAllVisibleGoals();
 
         adapter = new GoalAdapter(getActivity(), goals);
-
-        imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         createListView();
 
@@ -77,8 +74,7 @@ public class GoalFragment extends Fragment {
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                Keyboard.hide(getContext());
                                 // TODO validate against 0 steps
                                 Goal goal = new Goal(nameEt.getText().toString(), Integer.parseInt(stepsEt.getText().toString()));
                                 db.goalDao().insert(goal);
@@ -91,8 +87,7 @@ public class GoalFragment extends Fragment {
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                Keyboard.hide(getContext());
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
@@ -113,8 +108,7 @@ public class GoalFragment extends Fragment {
                 });
                 alertDialog.show();
                 nameEt.requestFocus();
-                // show keyboard
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                Keyboard.show(getContext());
             }
         });
     }
@@ -149,8 +143,7 @@ public class GoalFragment extends Fragment {
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // hide keyboard
-                                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                        Keyboard.hide(getContext());
                                         // TODO validate against 0 steps
                                         clickedGoal.name = nameEt.getText().toString();
                                         clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
@@ -164,8 +157,7 @@ public class GoalFragment extends Fragment {
                                 .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
-                                        // hide keyboard
-                                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                        Keyboard.hide(getContext());
                                     }
                                 })
                                 .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
