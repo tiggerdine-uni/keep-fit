@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,7 +129,9 @@ public class StatusFragment extends Fragment {
                                     today.steps += addSteps;
                                     db.dayDao().update(today);
                                 }
-                                if (armNotification && today.steps >= (float) selectedGoal.steps / 2) {
+                                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), true);
+                                if (notifications && armNotification && today.steps >= (float) selectedGoal.steps / 2) {
                                     Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
                                 }
                                 if (armConfetti && today.steps >= selectedGoal.steps) {
