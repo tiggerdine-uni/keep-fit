@@ -48,15 +48,16 @@ public class StatusFragment extends Fragment {
     private ArrayAdapter spinnerArrayAdapter;
     private Spinner spinner;
     private Goal activeGoal;
+    private float progress;
+
+    static StatusFragment getInstance() {
+        return instance;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
-    }
-
-    static StatusFragment getInstance() {
-        return instance;
     }
 
     @Override
@@ -70,16 +71,16 @@ public class StatusFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Goal selectedGoal = (Goal) spinner.getSelectedItem();
-                    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
-                    editor.commit();
-                    Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
-                    Day today = today();
-                    today.goalId = selectedGoal.goalId;
-                    db.dayDao().update(today);
-                    refresh();
+                Goal selectedGoal = (Goal) spinner.getSelectedItem();
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
+                editor.commit();
+                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
+                Day today = today();
+                today.goalId = selectedGoal.goalId;
+                db.dayDao().update(today);
+                refresh();
             }
 
             @Override
@@ -106,11 +107,18 @@ public class StatusFragment extends Fragment {
                                 Date date = Utils.getDay();
                                 Day today = db.dayDao().findDayWithDate(date);
                                 int addSteps = Integer.parseInt(et.getText().toString());
-                                if(today == null) {
+                                boolean confetti = false;
+                                if (today.steps < activeGoal.steps) {
+                                    confetti = true;
+                                }
+                                if (today == null) {
                                     db.dayDao().insert(new Day(date, addSteps));
                                 } else {
                                     today.steps += addSteps;
                                     db.dayDao().update(today);
+                                }
+                                if (confetti && today.steps >= activeGoal.steps) {
+                                    makeConfetti();
                                 }
                                 // steps += Integer.parseInt(et.getText().toString());
                                 refresh();
@@ -148,6 +156,20 @@ public class StatusFragment extends Fragment {
         return view;
     }
 
+    private void makeConfetti() {
+        viewKonfetti.build()
+                // TODO don't hardcode these colors
+                .addColors(Color.parseColor("#fa1434"), Color.parseColor("#48ba2d"), Color.parseColor("#1899dd"))
+                .setDirection(0.0, 359.0)
+                .setSpeed(1f, 5f)
+                .setFadeOutEnabled(true)
+                .setTimeToLive(2000L)
+                .addShapes(Shape.RECT, Shape.CIRCLE)
+                .addSizes(new Size(12, 5))
+                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                .streamFor(300, 5000L);
+    }
+
     private Day today() {
         Date date = Utils.getDay();
         Day today = db.dayDao().findDayWithDate(date);
@@ -178,22 +200,9 @@ public class StatusFragment extends Fragment {
             } else {
                 steps = today.steps;
             }
-            float progress = (float) steps / activeGoal.steps;
+            progress = (float) steps / activeGoal.steps;
             if (progress >= 1) {
                 progress = 1;
-
-                // TODO don't do this exactly here
-                viewKonfetti.build()
-                        // TODO don't hardcode these colors
-                        .addColors(Color.parseColor("#fa1434"), Color.parseColor("#48ba2d"), Color.parseColor("#1899dd"))
-                        .setDirection(0.0, 359.0)
-                        .setSpeed(1f, 5f)
-                        .setFadeOutEnabled(true)
-                        .setTimeToLive(2000L)
-                        .addShapes(Shape.RECT, Shape.CIRCLE)
-                        .addSizes(new Size(12, 5))
-                        .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
-                        .streamFor(300, 5000L);
             }
             String statusText = steps + "/" + activeGoal.steps;
             statusTv.setText(statusText);
