@@ -15,4 +15,5 @@
     <string name="toast_goal_editing_disabled">Enable goal editing to edit goals.</string>
     <string name="active_goal_id_key">active_goal_id</string>
     <string name="toast_cannot_edit">Cannot edit active goal.</string>
+    <string name="no_goals">No goals.</string>
 </resources>

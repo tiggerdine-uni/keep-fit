@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +46,7 @@ public class StatusFragment extends Fragment {
     private List<Goal> goals;
     private ArrayAdapter spinnerArrayAdapter;
     private Spinner spinner;
-    private Goal activeGoal;
+    private Goal selectedGoal;
     private float progress;
 
     static StatusFragment getInstance() {
@@ -62,11 +61,16 @@ public class StatusFragment extends Fragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //
         View view = inflater.inflate(R.layout.fragment_status, container, false);
+
+        /**
+         *
+         */
         db = AppDatabase.getAppDatabase(getContext());
         goals = db.goalDao().loadAllVisibleGoals();
         spinner = view.findViewById(R.id.spinner);
-        spinnerArrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, goals);
+        spinnerArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, goals);
         spinner.setAdapter(spinnerArrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -75,8 +79,8 @@ public class StatusFragment extends Fragment {
                 SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
-                editor.commit();
-                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
+                editor.apply();
+//                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
                 Day today = today();
                 today.goalId = selectedGoal.goalId;
                 db.dayDao().update(today);
@@ -88,7 +92,11 @@ public class StatusFragment extends Fragment {
 
             }
         });
-        activeGoal = (Goal) spinner.getSelectedItem();
+        selectedGoal = (Goal) spinner.getSelectedItem();
+
+        /**
+         *
+         */
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +105,8 @@ public class StatusFragment extends Fragment {
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_steps, null);
                 final EditText et = dialogView.findViewById(R.id.et);
-                final InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                final InputMethodManager imm = (InputMethodManager)
+                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 builder.setView(dialogView)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -108,7 +117,7 @@ public class StatusFragment extends Fragment {
                                 Day today = db.dayDao().findDayWithDate(date);
                                 int addSteps = Integer.parseInt(et.getText().toString());
                                 boolean confetti = false;
-                                if (today.steps < activeGoal.steps) {
+                                if (today.steps < selectedGoal.steps) {
                                     confetti = true;
                                 }
                                 if (today == null) {
@@ -117,10 +126,9 @@ public class StatusFragment extends Fragment {
                                     today.steps += addSteps;
                                     db.dayDao().update(today);
                                 }
-                                if (confetti && today.steps >= activeGoal.steps) {
+                                if (confetti && today.steps >= selectedGoal.steps) {
                                     makeConfetti();
                                 }
-                                // steps += Integer.parseInt(et.getText().toString());
                                 refresh();
                             }
                         })
@@ -128,14 +136,15 @@ public class StatusFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 // hide keyboard
-                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY,0);
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
                 alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                     @Override
                     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                        if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (event.getAction() == KeyEvent.ACTION_DOWN &&
+                                      keyCode == KeyEvent.KEYCODE_ENTER) {
                             alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
                             return true;
                         }
@@ -148,28 +157,46 @@ public class StatusFragment extends Fragment {
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             }
         });
+
+        //
         progressTextView = view.findViewById(R.id.progress_text_view);
         statusTv = view.findViewById(R.id.status_tv);
         wheel = view.findViewById(R.id.progress_wheel);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
+
+        //
         refresh();
+
+        //
         return view;
     }
 
+    /**
+     *
+     */
     private void makeConfetti() {
         viewKonfetti.build()
                 // TODO don't hardcode these colors
-                .addColors(Color.parseColor("#fa1434"), Color.parseColor("#48ba2d"), Color.parseColor("#1899dd"))
+                .addColors(Color.parseColor("#a864fd"),
+                           Color.parseColor("#29cdff"),
+                           Color.parseColor("#78ff44"),
+                           Color.parseColor("#ff718d"),
+                           Color.parseColor("#fdff6a"))
                 .setDirection(0.0, 359.0)
                 .setSpeed(1f, 5f)
                 .setFadeOutEnabled(true)
                 .setTimeToLive(2000L)
                 .addShapes(Shape.RECT, Shape.CIRCLE)
-                .addSizes(new Size(12, 5))
-                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                .addSizes(new Size(10, 5))
+                .setPosition(-50f, viewKonfetti.getWidth() + 50f,
+                             -50f, -50f)
                 .streamFor(300, 5000L);
     }
 
+    /**
+     *
+     * @return
+     */
     private Day today() {
         Date date = Utils.getDay();
         Day today = db.dayDao().findDayWithDate(date);
@@ -179,6 +206,9 @@ public class StatusFragment extends Fragment {
         return db.dayDao().findDayWithDate(date);
     }
 
+    /**
+     *
+     */
     void refresh() {
         goals.clear();
         goals.addAll(db.goalDao().loadAllVisibleGoals());
@@ -187,11 +217,11 @@ public class StatusFragment extends Fragment {
         int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
         // Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
         AppDatabase db = AppDatabase.getAppDatabase(getContext());
-        activeGoal = db.goalDao().findGoalWithId(activeGoalId);
-        if (activeGoal == null) {
-            statusTv.setText("No goals.");
+        selectedGoal = db.goalDao().findGoalWithId(activeGoalId);
+        if (selectedGoal == null) {
+            statusTv.setText(getString(R.string.no_goals));
         } else {
-            spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
+            spinner.setSelection(spinnerArrayAdapter.getPosition(selectedGoal));
             Date date = Utils.getDay();
             Day today = db.dayDao().findDayWithDate(date);
             int steps;
@@ -200,11 +230,11 @@ public class StatusFragment extends Fragment {
             } else {
                 steps = today.steps;
             }
-            progress = (float) steps / activeGoal.steps;
+            progress = (float) steps / selectedGoal.steps;
             if (progress >= 1) {
                 progress = 1;
             }
-            String statusText = steps + "/" + activeGoal.steps;
+            String statusText = steps + "/" + selectedGoal.steps;
             statusTv.setText(statusText);
             String progressText = (int) (progress * 100) + "%";
             progressTextView.setText(progressText);
@@ -213,6 +243,10 @@ public class StatusFragment extends Fragment {
         }
     }
 
+    /**
+     *
+     * @param progress
+     */
     private void setBarColor(float progress) {
         switch ((int) Math.floor(progress * 10)) {
             case 0:
