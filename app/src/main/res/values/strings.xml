@@ -16,4 +16,5 @@
     <string name="active_goal_id_key">active_goal_id</string>
     <string name="toast_cannot_edit">Cannot edit active goal.</string>
     <string name="no_goals">No goals.</string>
+    <string name="settings_clear_history_key">clear_history</string>
 </resources>

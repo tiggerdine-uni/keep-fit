@@ -3,7 +3,6 @@ package com.example.keepfit;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +58,7 @@ public class HistoryFragment extends Fragment {
                         // TODO reword some of these
                         float proportion = (float) day.steps / goal.steps;
                         if (proportion > 1)
-                                proportion = 1;
+                            proportion = 1;
                         // TODO ... and here too
                         historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
                     }
@@ -67,45 +66,40 @@ public class HistoryFragment extends Fragment {
                 historyTextView.setText(historyText);
                 builder.setView(dialogView)
                         .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
-                        View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
-                        final EditText et = stepsDialogView.findViewById(R.id.et);
-                        // TODO also show the date here
-                        builder2.setView(stepsDialogView)
-                                .setPositiveButton("POS", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Keyboard.hide(getContext());
-                                        int addSteps = Integer.parseInt(et.getText().toString());
-                                        if(day == null) {
-                                            db.dayDao().insert(new Day(date, addSteps));
-                                        } else {
-                                            day.steps += addSteps;
-                                            db.dayDao().update(day);
-                                        }
-                                        StatusFragment statusFragment = StatusFragment.getInstance();
-                                        statusFragment.refresh();
-                                    }
-                                })
-                                .setNegativeButton("NEG", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Keyboard.hide(getContext());
-                                    }
-                                });
-                        AlertDialog stepsDialog = builder2.create();
-                        stepsDialog.show();
-                        Keyboard.show(getContext());
-                    }
-                })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                                View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
+                                final EditText et = stepsDialogView.findViewById(R.id.et);
+                                // TODO also show the date here
+                                builder2.setView(stepsDialogView)
+                                        .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Keyboard.hide(getContext());
+                                                int addSteps = Integer.parseInt(et.getText().toString());
+                                                if (day == null) {
+                                                    db.dayDao().insert(new Day(date, addSteps));
+                                                } else {
+                                                    day.steps += addSteps;
+                                                    db.dayDao().update(day);
+                                                }
+                                                StatusFragment statusFragment = StatusFragment.getInstance();
+                                                statusFragment.refresh();
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Keyboard.hide(getContext());
+                                            }
+                                        });
+                                AlertDialog stepsDialog = builder2.create();
+                                stepsDialog.show();
+                                Keyboard.show(getContext());
+                            }
+                        })
+                        .setNegativeButton("Cancel", null);
                 AlertDialog historyDialog = builder.create();
                 historyDialog.show();
             }

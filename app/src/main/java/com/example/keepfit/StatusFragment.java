@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Day;
@@ -113,9 +114,13 @@ public class StatusFragment extends Fragment {
                                 Date date = Utils.getDay();
                                 Day today = db.dayDao().findDayWithDate(date);
                                 int addSteps = Integer.parseInt(et.getText().toString());
-                                boolean confetti = false;
+                                boolean armNotification = false;
+                                boolean armConfetti = false;
+                                if (today.steps < (float) selectedGoal.steps / 2) {
+                                    armNotification = true;
+                                }
                                 if (today.steps < selectedGoal.steps) {
-                                    confetti = true;
+                                    armConfetti = true;
                                 }
                                 if (today == null) {
                                     db.dayDao().insert(new Day(date, addSteps));
@@ -123,7 +128,10 @@ public class StatusFragment extends Fragment {
                                     today.steps += addSteps;
                                     db.dayDao().update(today);
                                 }
-                                if (confetti && today.steps >= selectedGoal.steps) {
+                                if (armNotification && today.steps >= (float) selectedGoal.steps / 2) {
+                                    Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
+                                }
+                                if (armConfetti && today.steps >= selectedGoal.steps) {
                                     makeConfetti();
                                 }
                                 refresh();

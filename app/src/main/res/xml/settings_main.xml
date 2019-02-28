@@ -31,4 +31,11 @@
         android:summaryOff="Disabled"
         android:defaultValue="false"/>
 
+    <Preference
+        android:title="Clear History"
+        android:key="@string/settings_clear_history_key"
+        android:summary="Click to clear history."/>
+
+
+
 </PreferenceScreen>
