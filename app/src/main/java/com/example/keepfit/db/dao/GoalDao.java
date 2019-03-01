@@ -12,8 +12,8 @@ import androidx.room.Update;
 
 @Dao
 public interface GoalDao {
-    @Query("SELECT * FROM goal")
-    List<Goal> loadAllGoals();
+//    @Query("SELECT * FROM goal")
+//    List<Goal> loadAllGoals();
 
     @Query("SELECT * FROM goal WHERE visible = 1")
     List<Goal> loadAllVisibleGoals();
@@ -27,12 +27,12 @@ public interface GoalDao {
     @Update
     void update(Goal goal);
 
-//    @Query("DELETE FROM goal WHERE goalId = :goalId")
-//    void deleteGoalWithId(int goalId);
-
     @Delete
     void delete(Goal goal);
 
     @Query("DELETE FROM goal")
     void nuke();
+
+    @Query("DELETE FROM goal WHERE visible = 0")
+    void deleteInvisibleGoals();
 }

@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             AppDatabase db = AppDatabase.getAppDatabase(getActivity());
                             db.dayDao().nuke();
-                            // TODO delete invisible goals
+                            db.goalDao().deleteInvisibleGoals();
                         }
                     })
                             .setNegativeButton("Cancel", null);
