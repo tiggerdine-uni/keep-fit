@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Goal;
@@ -97,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
+        StatusFragment.getInstance().recordActivity(1);
     }
 
     @Override

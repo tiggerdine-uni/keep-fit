@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -39,7 +38,6 @@ import nl.dionsegijn.konfetti.models.Size;
 public class StatusFragment extends Fragment {
 
     private static StatusFragment instance = null;
-    // TODO do all these things really need to be class variables?
     private TextView statusTv;
     private TextView progressTextView;
     private KonfettiView viewKonfetti;
@@ -49,7 +47,6 @@ public class StatusFragment extends Fragment {
     private ArrayAdapter spinnerArrayAdapter;
     private Spinner spinner;
     private Goal selectedGoal;
-    private float progress;
 
     static StatusFragment getInstance() {
         return instance;
@@ -112,32 +109,8 @@ public class StatusFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
-                                Date date = Utils.getDay();
-                                Day today = db.dayDao().findDayWithDate(date);
-                                int addSteps = Integer.parseInt(et.getText().toString());
-                                boolean armNotification = false;
-                                boolean armConfetti = false;
-                                if (today.steps < (float) selectedGoal.steps / 2) {
-                                    armNotification = true;
-                                }
-                                if (today.steps < selectedGoal.steps) {
-                                    armConfetti = true;
-                                }
-                                if (today == null) {
-                                    db.dayDao().insert(new Day(date, addSteps));
-                                } else {
-                                    today.steps += addSteps;
-                                    db.dayDao().update(today);
-                                }
-                                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-                                Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), true);
-                                if (notifications && armNotification && today.steps >= (float) selectedGoal.steps / 2) {
-                                    Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
-                                }
-                                if (armConfetti && today.steps >= selectedGoal.steps) {
-                                    makeConfetti();
-                                }
-                                refresh();
+                                int n = Integer.parseInt(et.getText().toString());
+                                recordActivity(n);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -177,7 +150,33 @@ public class StatusFragment extends Fragment {
         return view;
     }
 
-
+    public void recordActivity(int n) {
+        Date date = Utils.getDay();
+        Day today = db.dayDao().findDayWithDate(date);
+        boolean armNotification = false;
+        boolean armConfetti = false;
+        if (today.steps < (float) selectedGoal.steps / 2) {
+            armNotification = true;
+        }
+        if (today.steps < selectedGoal.steps) {
+            armConfetti = true;
+        }
+        if (today == null) {
+            db.dayDao().insert(new Day(date, n));
+        } else {
+            today.steps += n;
+            db.dayDao().update(today);
+        }
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), true);
+        if (notifications && armNotification && today.steps >= (float) selectedGoal.steps / 2) {
+            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
+        }
+        if (armConfetti && today.steps >= selectedGoal.steps) {
+            makeConfetti();
+        }
+        refresh();
+    }
 
     /**
      *
@@ -238,7 +237,7 @@ public class StatusFragment extends Fragment {
             } else {
                 steps = today.steps;
             }
-            progress = (float) steps / selectedGoal.steps;
+            float progress = (float) steps / selectedGoal.steps;
             if (progress >= 1) {
                 progress = 1;
             }
