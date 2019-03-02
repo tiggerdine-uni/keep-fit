@@ -1,6 +1,5 @@
 package com.example.keepfit;
 
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,8 +8,10 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
+import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +19,8 @@ import androidx.viewpager.widget.ViewPager;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    private boolean isResumed;
     private SensorManager sensorManager;
+    private Sensor stepCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,25 +38,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        isResumed = false;
+        sensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isResumed = true;
-        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        if (sensor != null) {
-            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-        } else {
-            // TODO no step counter
-        }
+        // TODO experiment with sensor delay
+        sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -76,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void manip(AppDatabase db) {
+        if (db.goalDao().loadAllVisibleGoals().isEmpty()) {
+            Goal goal = new Goal("My First Goal", 1000);
+            db.goalDao().insert(goal);
+        }
 //        db.goalDao().nuke();
 //        db.dayDao().nuke();
 //        Goal goal1 = new Goal("Goal 1", 10000);
@@ -91,8 +92,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float value = event.values[0];
-        // TODO do something
+        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
     }
 
     @Override
