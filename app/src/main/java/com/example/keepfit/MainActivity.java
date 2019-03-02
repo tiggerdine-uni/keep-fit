@@ -1,11 +1,13 @@
 package com.example.keepfit;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -51,8 +53,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-        // TODO experiment with sensor delay
-        sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean scEnabled = sharedPrefs.getBoolean(getString(R.string.settings_step_counter_key), true);
+        if (scEnabled) {
+            sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
