@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,14 +43,16 @@ import nl.dionsegijn.konfetti.models.Size;
 public class StatusFragment extends Fragment {
 
     private static StatusFragment instance = null;
+
     private TextView statusTv;
     private TextView progressTextView;
     private KonfettiView viewKonfetti;
+    private Spinner spinner;
     private ProgressWheel wheel;
+
     private AppDatabase db;
     private List<Goal> goals;
     private ArrayAdapter spinnerArrayAdapter;
-    private Spinner spinner;
     private Goal selectedGoal;
 
     static StatusFragment getInstance() {
@@ -64,17 +67,24 @@ public class StatusFragment extends Fragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //
         View view = inflater.inflate(R.layout.fragment_status, container, false);
 
-        /**
-         *
-         */
+        // Get the database.
         db = AppDatabase.getAppDatabase(getContext());
+
+        // Query the database for goals.
         goals = db.goalDao().loadAllVisibleGoals();
+
+        // Find the spinner.
         spinner = view.findViewById(R.id.spinner);
+
+        //
         spinnerArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.goal_spinner_item, goals);
+
+        //
         spinner.setAdapter(spinnerArrayAdapter);
+
+        //
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -95,11 +105,11 @@ public class StatusFragment extends Fragment {
 
             }
         });
+
+        //
         selectedGoal = (Goal) spinner.getSelectedItem();
 
-        /**
-         *
-         */
+        // Find the floating action button.
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,9 +125,10 @@ public class StatusFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
-                                int n = Integer.parseInt(et.getText().toString());
-                                if(n > 0) {
-                                    recordActivity(n);
+                                int steps = Integer.parseInt(et.getText().toString());
+                                // Don't record 0 steps.
+                                if(steps > 0) {
+                                    record(steps);
                                 }
                             }
                         })
@@ -144,20 +155,23 @@ public class StatusFragment extends Fragment {
             }
         });
 
-        //
+        // Find the views that get refreshed...
         progressTextView = view.findViewById(R.id.progress_text_view);
         statusTv = view.findViewById(R.id.status_tv);
         wheel = view.findViewById(R.id.progress_wheel);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
 
-        //
+        // ... and refresh them.
         refresh();
 
-        //
         return view;
     }
 
-    public void recordActivity(int n) {
+    /**
+     *
+     * @param steps
+     */
+    public void record(int steps) {
         Date date = Utils.getDay();
         Day today = db.dayDao().findDayWithDate(date);
         boolean armNotification = false;
@@ -169,9 +183,9 @@ public class StatusFragment extends Fragment {
             armConfetti = true;
         }
         if (today == null) {
-            db.dayDao().insert(new Day(date, n));
+            db.dayDao().insert(new Day(date, steps));
         } else {
-            today.steps += n;
+            today.steps += steps;
             db.dayDao().update(today);
         }
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -181,7 +195,7 @@ public class StatusFragment extends Fragment {
 //            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
         }
         if (armConfetti && today.steps >= selectedGoal.steps) {
-            makeConfetti();
+            fireConfetti();
         }
         refresh();
     }
@@ -225,9 +239,9 @@ public class StatusFragment extends Fragment {
     }
 
     /**
-     *
+     * Fires celebratory confetti.
      */
-    private void makeConfetti() {
+    private void fireConfetti() {
         viewKonfetti.build()
                 .addColors(R.color.colorConfetti1,
                            R.color.colorConfetti2,
@@ -259,16 +273,24 @@ public class StatusFragment extends Fragment {
     }
 
     /**
-     *
+     * Queries the database for goals and refreshes the views.
      */
     void refresh() {
+        //
         goals.clear();
+
+        // Query the database for goals.
         goals.addAll(db.goalDao().loadAllVisibleGoals());
+
+        // Notify the adapter.
         spinnerArrayAdapter.notifyDataSetChanged();
+
+        // Get the id of the active goal.
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         int activeGoalId = sharedPref.getInt(getString(R.string.active_goal_id_key), 0);
-        // Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
-        AppDatabase db = AppDatabase.getAppDatabase(getContext());
+//        Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
+
+        // Get the active goal.
         selectedGoal = db.goalDao().findGoalWithId(activeGoalId);
         if (selectedGoal == null) {
             statusTv.setText(getString(R.string.no_goals));

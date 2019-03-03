@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
 //        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
-        StatusFragment.getInstance().recordActivity(1);
+        StatusFragment.getInstance().record(1);
     }
 
     @Override

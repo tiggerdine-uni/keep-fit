@@ -33,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
                     TextView confirmTextView = new TextView(getActivity());
                     confirmTextView.setText("Clear history?");
                     builder.setView(confirmTextView)
-                            .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             AppDatabase db = AppDatabase.getAppDatabase(getActivity());
@@ -41,7 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
                             db.goalDao().deleteInvisibleGoals();
                         }
                     })
-                            .setNegativeButton("Cancel", null);
+                            .setNegativeButton("No", null);
                     builder.show();
                     return true;
                 }
