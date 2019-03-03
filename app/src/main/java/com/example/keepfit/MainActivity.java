@@ -35,17 +35,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         setContentView(R.layout.activity_main);
 
-        //
+        // Find the pager.
         ViewPager viewPager = findViewById(R.id.viewpager);
+
+        // Create an adapter.
         SimpleFragmentPagerAdapter adapter = new SimpleFragmentPagerAdapter(this, getSupportFragmentManager());
+
+        // Connect the pager and the adapter.
         viewPager.setAdapter(adapter);
 
-        //
+        // Find the tabs.
         TabLayout tabLayout = findViewById(R.id.tabs);
+
+        // Connect the tabs and the pager.
         tabLayout.setupWithViewPager(viewPager);
 
-        //
+        // Get the sensor manager.
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        // Get the step counter sensor.
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
     }
 
@@ -99,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             db.goalDao().insert(goal);
         }
 
+        // These lines were used to test the database.
 //        db.goalDao().nuke();
 //        db.dayDao().nuke();
 //        Goal goal1 = new Goal("Goal 1", 10000);
@@ -114,9 +123,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
         // Add 1 step.
         StatusFragment.getInstance().record(1);
+//        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
     }
 
     @Override
