@@ -21,6 +21,9 @@ public interface GoalDao {
     @Query("SELECT * FROM goal WHERE goalId = :id")
     Goal findGoalWithId(int id);
 
+    @Query("SELECT * FROM goal WHERE visible = 1 AND name = :name")
+    Goal findVisibleGoalWithName(String name);
+
     @Insert
     void insert(Goal goal);
 

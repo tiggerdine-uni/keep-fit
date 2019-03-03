@@ -78,6 +78,8 @@ public class GoalFragment extends Fragment {
                                 String stepsString = stepsEt.getText().toString();
                                 if (nameString.trim().isEmpty()) {
                                     Toast.makeText(getContext(), "Please enter a name.", Toast.LENGTH_SHORT).show();
+                                } else if (db.goalDao().findVisibleGoalWithName(nameString) != null) {
+                                    Toast.makeText(getContext(), "There is already a goal called " + nameString + ".", Toast.LENGTH_SHORT).show();
                                 } else if (stepsString.isEmpty()) {
                                     Toast.makeText(getContext(), "Please enter a number of steps.", Toast.LENGTH_SHORT).show();
                                 } else {
@@ -159,13 +161,15 @@ public class GoalFragment extends Fragment {
                                         String stepsString = stepsEt.getText().toString();
                                         if (nameString.trim().isEmpty()) {
                                             Toast.makeText(getContext(), "Please enter a name.", Toast.LENGTH_SHORT).show();
+                                        } else if (db.goalDao().findVisibleGoalWithName(nameString) != null) {
+                                            Toast.makeText(getContext(), "There is already a goal called " + nameString + ".", Toast.LENGTH_SHORT).show();
                                         } else if (stepsString.isEmpty()) {
                                             Toast.makeText(getContext(), "Please enter a number of steps.", Toast.LENGTH_SHORT).show();
                                         } else {
                                             int steps = Integer.parseInt(stepsString);
                                             if (steps == 0) {
                                                 Toast.makeText(getContext(), "0 steps? What kind of a goal is that?", Toast.LENGTH_SHORT).show();
-                                            } else {
+                                            } else if (!(clickedGoal.name == nameString && clickedGoal.steps == steps)) {
                                                 clickedGoal.name = nameString;
                                                 clickedGoal.steps = steps;
                                                 db.goalDao().update(clickedGoal);
