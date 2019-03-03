@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -75,13 +74,25 @@ public class GoalFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
-                                // TODO validate against 0 steps
-                                Goal goal = new Goal(nameEt.getText().toString(), Integer.parseInt(stepsEt.getText().toString()));
-                                db.goalDao().insert(goal);
-                                adapter.clear();
-                                adapter.addAll(db.goalDao().loadAllVisibleGoals());
-                                adapter.notifyDataSetChanged();
-                                StatusFragment.getInstance().refresh();
+                                String nameString = nameEt.getText().toString();
+                                String stepsString = stepsEt.getText().toString();
+                                if (nameString.trim().isEmpty()) {
+                                    Toast.makeText(getContext(), "Please enter a name.", Toast.LENGTH_SHORT).show();
+                                } else if (stepsString.isEmpty()) {
+                                    Toast.makeText(getContext(), "Please enter a number of steps.", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    int steps = Integer.parseInt(stepsString);
+                                    if (steps == 0) {
+                                        Toast.makeText(getContext(), "0 steps? What kind of a goal is that?", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Goal goal = new Goal(nameString, steps);
+                                        db.goalDao().insert(goal);
+                                        adapter.clear();
+                                        adapter.addAll(db.goalDao().loadAllVisibleGoals());
+                                        adapter.notifyDataSetChanged();
+                                        StatusFragment.getInstance().refresh();
+                                    }
+                                }
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
