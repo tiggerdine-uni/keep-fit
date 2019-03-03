@@ -9,6 +9,7 @@
         android:id="@+id/goal_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="24dp"
         tools:text="My Goal" />
 
     <TextView
@@ -16,13 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="10000"
+        android:textSize="16dp"
         android:layout_below="@id/goal_name" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        tools:text="Active" />
 
 </RelativeLayout>

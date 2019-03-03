@@ -69,7 +69,7 @@ public class StatusFragment extends Fragment {
         db = AppDatabase.getAppDatabase(getContext());
         goals = db.goalDao().loadAllVisibleGoals();
         spinner = view.findViewById(R.id.spinner);
-        spinnerArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, goals);
+        spinnerArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.goal_spinner_item, goals);
         spinner.setAdapter(spinnerArrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

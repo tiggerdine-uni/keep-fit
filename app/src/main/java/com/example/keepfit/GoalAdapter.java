@@ -22,7 +22,7 @@ public class GoalAdapter extends ArrayAdapter<Goal> {
         View listItemView = convertView;
         if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.goal, parent, false);
+                    R.layout.goal_list_item, parent, false);
         }
 
         Goal currentGoal = getItem(position);
