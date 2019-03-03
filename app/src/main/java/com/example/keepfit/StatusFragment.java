@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +52,7 @@ public class StatusFragment extends Fragment {
     private AppDatabase db;
     private List<Goal> goals;
     private ArrayAdapter spinnerArrayAdapter;
-    private Goal selectedGoal;
+    private Goal activeGoal;
 
     static StatusFragment getInstance() {
         return instance;
@@ -93,7 +92,7 @@ public class StatusFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
                 editor.apply();
-//                Log.v("StatusFragment", "putting id " + selectedGoal.goalId);
+//                Log.v("StatusFragment", "putting id " + activeGoal.goalId);
                 Day today = today();
                 today.goalId = selectedGoal.goalId;
                 db.dayDao().update(today);
@@ -107,7 +106,7 @@ public class StatusFragment extends Fragment {
         });
 
         //
-        selectedGoal = (Goal) spinner.getSelectedItem();
+        activeGoal = (Goal) spinner.getSelectedItem();
 
         // Find the floating action button.
         FloatingActionButton fab = view.findViewById(R.id.fab);
@@ -176,10 +175,10 @@ public class StatusFragment extends Fragment {
         Day today = db.dayDao().findDayWithDate(date);
         boolean armNotification = false;
         boolean armConfetti = false;
-        if (today.steps < (float) selectedGoal.steps / 2) {
+        if (today.steps < (float) activeGoal.steps / 2) {
             armNotification = true;
         }
-        if (today.steps < selectedGoal.steps) {
+        if (today.steps < activeGoal.steps) {
             armConfetti = true;
         }
         if (today == null) {
@@ -190,11 +189,11 @@ public class StatusFragment extends Fragment {
         }
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), false);
-        if (notifications && armNotification && today.steps >= (float) selectedGoal.steps / 2) {
+        if (notifications && armNotification && today.steps >= (float) activeGoal.steps / 2) {
             showNotification();
 //            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
         }
-        if (armConfetti && today.steps >= selectedGoal.steps) {
+        if (armConfetti && today.steps >= activeGoal.steps) {
             fireConfetti();
         }
         refresh();
@@ -291,11 +290,13 @@ public class StatusFragment extends Fragment {
 //        Log.v("StatusFragment", "activeGoalId = " + activeGoalId);
 
         // Get the active goal.
-        selectedGoal = db.goalDao().findGoalWithId(activeGoalId);
-        if (selectedGoal == null) {
+        activeGoal = db.goalDao().findGoalWithId(activeGoalId);
+        // ...
+        if (activeGoal == null) {
+            // ...
             statusTv.setText(getString(R.string.no_goals));
         } else {
-            spinner.setSelection(spinnerArrayAdapter.getPosition(selectedGoal));
+            spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
             Date date = Utils.getDay();
             Day today = db.dayDao().findDayWithDate(date);
             int steps;
@@ -304,11 +305,11 @@ public class StatusFragment extends Fragment {
             } else {
                 steps = today.steps;
             }
-            float progress = (float) steps / selectedGoal.steps;
+            float progress = (float) steps / activeGoal.steps;
             if (progress >= 1) {
                 progress = 1;
             }
-            String statusText = steps + "/" + selectedGoal.steps;
+            String statusText = steps + "/" + activeGoal.steps;
             statusTv.setText(statusText);
             String progressText = (int) (progress * 100) + "%";
             progressTextView.setText(progressText);
