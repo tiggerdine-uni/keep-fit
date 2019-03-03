@@ -2,18 +2,22 @@ package com.example.keepfit;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,23 +50,20 @@ public class HistoryFragment extends Fragment {
                 View dialogView = inflater.inflate(R.layout.dialog_history, null);
                 TextView historyTextView = dialogView.findViewById(R.id.history_text_view);
 
-                // TODO make it so you can't click future dates - set max date? other way?
-
-                String historyText = "";
+                String pattern = "EEEE dd MMMM yyyy";
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                String historyText = "Date: " + simpleDateFormat.format(date);
                 if (day == null) {
-                    historyText = "No activity recorded on this day.";
+                    historyText += "\nNo activity.";
                 } else {
                     Goal goal = db.goalDao().findGoalWithId(day.goalId);
                     if (goal == null) {
-                        // TODO also display the date...
-                        historyText = "Goal: None\nSteps: " + day.steps;
+                        historyText += "\nSteps: " + day.steps;
                     } else {
-                        // TODO reword some of these
                         float proportion = (float) day.steps / goal.steps;
                         if (proportion > 1)
                             proportion = 1;
-                        // TODO ... and here too
-                        historyText = "Goal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
+                        historyText += "\nGoal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
                     }
                 }
                 historyTextView.setText(historyText);
@@ -70,35 +71,41 @@ public class HistoryFragment extends Fragment {
                         .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
-                                View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
-                                final EditText et = stepsDialogView.findViewById(R.id.et);
-                                // TODO also show the date here
-                                builder2.setView(stepsDialogView)
-                                        .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Keyboard.hide(getContext());
-                                                int addSteps = Integer.parseInt(et.getText().toString());
-                                                if (day == null) {
-                                                    db.dayDao().insert(new Day(date, addSteps));
-                                                } else {
-                                                    day.steps += addSteps;
-                                                    db.dayDao().update(day);
+                                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+                                Boolean historicActivityRecording = sharedPrefs.getBoolean(getString(R.string.settings_historic_activity_recording_key), false);
+                                if(historicActivityRecording) {
+                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                                    View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
+                                    final EditText et = stepsDialogView.findViewById(R.id.et);
+                                    // TODO also show the date here
+                                    builder2.setView(stepsDialogView)
+                                            .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Keyboard.hide(getContext());
+                                                    int addSteps = Integer.parseInt(et.getText().toString());
+                                                    if (day == null) {
+                                                        db.dayDao().insert(new Day(date, addSteps));
+                                                    } else {
+                                                        day.steps += addSteps;
+                                                        db.dayDao().update(day);
+                                                    }
+                                                    StatusFragment statusFragment = StatusFragment.getInstance();
+                                                    statusFragment.refresh();
                                                 }
-                                                StatusFragment statusFragment = StatusFragment.getInstance();
-                                                statusFragment.refresh();
-                                            }
-                                        })
-                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Keyboard.hide(getContext());
-                                            }
-                                        });
-                                AlertDialog stepsDialog = builder2.create();
-                                stepsDialog.show();
-                                Keyboard.show(getContext());
+                                            })
+                                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Keyboard.hide(getContext());
+                                                }
+                                            });
+                                    AlertDialog stepsDialog = builder2.create();
+                                    stepsDialog.show();
+                                    Keyboard.show(getContext());
+                                } else {
+                                    Toast.makeText(getContext(), "Enable historic activity recording to record historic activity.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         })
                         .setNegativeButton("Cancel", null);
