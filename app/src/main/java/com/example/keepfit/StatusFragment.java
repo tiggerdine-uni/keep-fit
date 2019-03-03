@@ -1,10 +1,16 @@
 package com.example.keepfit;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
@@ -30,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import nl.dionsegijn.konfetti.KonfettiView;
 import nl.dionsegijn.konfetti.models.Shape;
@@ -168,14 +176,54 @@ public class StatusFragment extends Fragment {
             db.dayDao().update(today);
         }
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), true);
+        Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), false);
         if (notifications && armNotification && today.steps >= (float) selectedGoal.steps / 2) {
-            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
+            showNotification();
+//            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
         }
         if (armConfetti && today.steps >= selectedGoal.steps) {
             makeConfetti();
         }
         refresh();
+    }
+
+    private void showNotification() {
+        /**
+         * The heads-up notification appears the moment your app issues the notification and it disappears after a moment, but remains visible in the notification drawer as usual.
+         *
+         * Example conditions that might trigger heads-up notifications include the following:
+         *
+         * The user's activity is in fullscreen mode (the app uses fullScreenIntent).
+         * The notification has high priority and uses ringtones or vibrations on devices running Android 7.1 (API level 25) and lower.
+         * The notification channel has high importance on devices running Android 8.0 (API level 26) and higher.
+         */
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel("0", name, importance);
+            channel.setDescription(description);
+            channel.enableVibration(true);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
+                // TODO change
+                .setSmallIcon(R.drawable.ic_walk)
+                .setContentTitle(getText(R.string.notification_title))
+                .setContentText(getText(R.string.notification_text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_VIBRATE);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(0, builder.build());
     }
 
     /**

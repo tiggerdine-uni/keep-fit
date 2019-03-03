@@ -36,6 +36,4 @@
         android:key="@string/settings_clear_history_key"
         android:summary="Click to clear history."/>
 
-
-
 </PreferenceScreen>

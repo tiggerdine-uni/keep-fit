@@ -12,9 +12,13 @@
     <string name="settings_historic_activity_recording_key">historic_activity_recording</string>
     <string name="settings_notifications_key">notifications</string>
     <string name="settings_step_counter_key">step_counter</string>
+    <string name="settings_clear_history_key">clear_history</string>
     <string name="toast_goal_editing_disabled">Enable goal editing to edit goals.</string>
     <string name="active_goal_id_key">active_goal_id</string>
     <string name="toast_cannot_edit">Cannot edit active goal.</string>
     <string name="no_goals">No goals.</string>
-    <string name="settings_clear_history_key">clear_history</string>
+    <string name="channel_name">Keep Fit Channel</string>
+    <string name="channel_description">:)</string>
+    <string name="notification_title">"Woah, we\'re half way there"</string>
+    <string name="notification_text">50% of your day\'s goal has been met</string>
 </resources>
