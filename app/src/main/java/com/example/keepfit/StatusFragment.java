@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -303,34 +302,34 @@ public class StatusFragment extends Fragment {
     private void setBarColor(float progress) {
         switch ((int) Math.floor(progress * 10)) {
             case 0:
-                wheel.setBarColor(0xfff44336);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient1));
                 break;
             case 1:
-                wheel.setBarColor(0xffec6d39);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient2));
                 break;
             case 2:
-                wheel.setBarColor(0xffe4923d);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient3));
                 break;
             case 3:
-                wheel.setBarColor(0xffddb240);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient4));
                 break;
             case 4:
-                wheel.setBarColor(0xffd5cd43);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient5));
                 break;
             case 5:
-                wheel.setBarColor(0xffb7cd45);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient6));
                 break;
             case 6:
-                wheel.setBarColor(0xff95c647);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient7));
                 break;
             case 7:
-                wheel.setBarColor(0xff78be49);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient8));
                 break;
             case 8:
-                wheel.setBarColor(0xff5eb64b);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient9));
                 break;
             default:
-                wheel.setBarColor(0xff4caf50);
+                wheel.setBarColor(getResources().getColor(R.color.colorGradient10));
                 break;
         }
     }

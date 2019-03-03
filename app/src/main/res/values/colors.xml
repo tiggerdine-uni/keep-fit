@@ -9,4 +9,15 @@
     <color name="colorConfetti3">#78ff44</color>
     <color name="colorConfetti4">#ff718d</color>
     <color name="colorConfetti5">#fdff6a</color>
+
+    <color name="colorGradient1">#f44336</color>
+    <color name="colorGradient2">#ec6d39</color>
+    <color name="colorGradient3">#e4923d</color>
+    <color name="colorGradient4">#ddb240</color>
+    <color name="colorGradient5">#d5cd43</color>
+    <color name="colorGradient6">#b7cd45</color>
+    <color name="colorGradient7">#95c647</color>
+    <color name="colorGradient8">#78be49</color>
+    <color name="colorGradient9">#5eb64b</color>
+    <color name="colorGradient10">#4caf50</color>
 </resources>
