@@ -154,11 +154,14 @@ public class GoalFragment extends Fragment {
                                             if (steps == 0) {
                                                 Toast.makeText(getContext(), "0 steps? What kind of a goal is that?", Toast.LENGTH_SHORT).show();
                                             } else if (!(clickedGoal.name == nameString && clickedGoal.steps == steps)) {
-                                                // TODO EDITING A GOAL:
-                                                // If any days have that goalId, make the old one invisible and update, then make a new goal and insert
-                                                // Otherwise, edit it and update
-                                                clickedGoal.name = nameString;
-                                                clickedGoal.steps = steps;
+                                                if(safe(clickedGoal)) {
+                                                    clickedGoal.name = nameString;
+                                                    clickedGoal.steps = steps;
+                                                } else {
+                                                    Goal newGoal = new Goal(nameString, steps);
+                                                    db.goalDao().insert(newGoal);
+                                                    clickedGoal.visible = 0;
+                                                }
                                                 db.goalDao().update(clickedGoal);
                                                 adapter.clear();
                                                 adapter.addAll(db.goalDao().loadAllVisibleGoals());
@@ -182,10 +185,7 @@ public class GoalFragment extends Fragment {
                                         builder.setView(confirmTv).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
-                                                // TODO DELETING A  GOAL:
-                                                // If any days have that goalId, set .invisible = 1 and update
-                                                // Otherwise, delete
-                                                if(safeToDelete(clickedGoal)) {
+                                                if(safe(clickedGoal)) {
                                                     // Log.v("delete", "clicked goal is safe to delete");
                                                     db.goalDao().delete(clickedGoal);
                                                 } else {
@@ -211,7 +211,7 @@ public class GoalFragment extends Fragment {
         });
     }
 
-    private boolean safeToDelete(Goal clickedGoal) {
+    private boolean safe(Goal clickedGoal) {
         List<Day> matches = db.dayDao().findDaysWithGoal(clickedGoal.goalId);
         if (matches.isEmpty()) {
             return true;
