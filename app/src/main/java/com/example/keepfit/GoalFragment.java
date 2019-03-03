@@ -186,23 +186,30 @@ public class GoalFragment extends Fragment {
                                 .setNegativeButton("Delete Goal", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        // TODO maybe confirm?
-                                        if(safeToDelete(clickedGoal)) {
-                                            // Log.v("delete", "clicked goal is safe to delete");
-                                            db.goalDao().delete(clickedGoal);
-                                        } else {
-                                            // Log.v("delete", "clicked goal is not safe to delete");
-                                            clickedGoal.visible = 0;
-                                            db.goalDao().update(clickedGoal);
-                                        }
-                                        adapter.clear();
-                                        adapter.addAll(db.goalDao().loadAllVisibleGoals());
-                                        adapter.notifyDataSetChanged();
-                                        StatusFragment.getInstance().refresh();
+                                        TextView confirmTv = new TextView(getContext());
+                                        confirmTv.setText("Delete " + clickedGoal.name + "?");
+                                        builder.setView(confirmTv).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if(safeToDelete(clickedGoal)) {
+                                                    // Log.v("delete", "clicked goal is safe to delete");
+                                                    db.goalDao().delete(clickedGoal);
+                                                } else {
+                                                    // Log.v("delete", "clicked goal is not safe to delete");
+                                                    clickedGoal.visible = 0;
+                                                    db.goalDao().update(clickedGoal);
+                                                }
+                                                adapter.clear();
+                                                adapter.addAll(db.goalDao().loadAllVisibleGoals());
+                                                adapter.notifyDataSetChanged();
+                                                StatusFragment.getInstance().refresh();
+                                            }
+                                        }).setNegativeButton("No", null);
+                                        AlertDialog confirmDialog = builder.create();
+                                        confirmDialog.show();
                                     }
                                 });
-                        final AlertDialog alertDialog = builder.create();
-                        // TODO keyboard stuff
+                        AlertDialog alertDialog = builder.create();
                         alertDialog.show();
                     }
                 }
