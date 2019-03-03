@@ -213,7 +213,6 @@ public class StatusFragment extends Fragment {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "0")
-                // TODO change
                 .setSmallIcon(R.drawable.ic_walk)
                 .setContentTitle(getText(R.string.notification_title))
                 .setContentText(getText(R.string.notification_text))
@@ -231,12 +230,11 @@ public class StatusFragment extends Fragment {
      */
     private void makeConfetti() {
         viewKonfetti.build()
-                // TODO don't hardcode these colors
-                .addColors(Color.parseColor("#a864fd"),
-                           Color.parseColor("#29cdff"),
-                           Color.parseColor("#78ff44"),
-                           Color.parseColor("#ff718d"),
-                           Color.parseColor("#fdff6a"))
+                .addColors(R.color.colorConfetti1,
+                           R.color.colorConfetti2,
+                           R.color.colorConfetti3,
+                           R.color.colorConfetti4,
+                           R.color.colorConfetti5)
                 .setDirection(0.0, 359.0)
                 .setSpeed(1f, 5f)
                 .setFadeOutEnabled(true)

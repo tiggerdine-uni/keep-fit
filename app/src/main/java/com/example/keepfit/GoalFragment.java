@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,21 +103,6 @@ public class GoalFragment extends Fragment {
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
-
-                // TODO this is meant to control the behaviour of pressing enter on keyboard
-                alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                    @Override
-                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                        // TODO this doesn't work right :(
-                        // Log.v("GoalFragment", "keyCode" + keyCode + ", name has focus? " + nameEt.hasFocus() + ", steps has focus? " + stepsEt.hasFocus());
-                        if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER && stepsEt.hasFocus()) {
-                            alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-                            return true;
-                        }
-
-                        return false;
-                    }
-                });
                 alertDialog.show();
                 nameEt.requestFocus();
                 Keyboard.show(getContext());
@@ -170,6 +154,9 @@ public class GoalFragment extends Fragment {
                                             if (steps == 0) {
                                                 Toast.makeText(getContext(), "0 steps? What kind of a goal is that?", Toast.LENGTH_SHORT).show();
                                             } else if (!(clickedGoal.name == nameString && clickedGoal.steps == steps)) {
+                                                // TODO EDITING A GOAL:
+                                                // If any days have that goalId, make the old one invisible and update, then make a new goal and insert
+                                                // Otherwise, edit it and update
                                                 clickedGoal.name = nameString;
                                                 clickedGoal.steps = steps;
                                                 db.goalDao().update(clickedGoal);
@@ -195,6 +182,9 @@ public class GoalFragment extends Fragment {
                                         builder.setView(confirmTv).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                // TODO DELETING A  GOAL:
+                                                // If any days have that goalId, set .invisible = 1 and update
+                                                // Otherwise, delete
                                                 if(safeToDelete(clickedGoal)) {
                                                     // Log.v("delete", "clicked goal is safe to delete");
                                                     db.goalDao().delete(clickedGoal);
