@@ -121,7 +121,9 @@ public class StatusFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
                                 int n = Integer.parseInt(et.getText().toString());
-                                recordActivity(n);
+                                if(n > 0) {
+                                    recordActivity(n);
+                                }
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -143,7 +145,6 @@ public class StatusFragment extends Fragment {
                     }
                 });
                 alertDialog.show();
-                et.requestFocus();
                 Keyboard.show(getContext());
             }
         });

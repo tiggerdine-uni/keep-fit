@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,14 +88,16 @@ public class HistoryFragment extends Fragment {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     Keyboard.hide(getContext());
                                                     int addSteps = Integer.parseInt(et.getText().toString());
-                                                    if (day == null) {
-                                                        db.dayDao().insert(new Day(date, addSteps));
-                                                    } else {
-                                                        day.steps += addSteps;
-                                                        db.dayDao().update(day);
+                                                    if (addSteps > 0) {
+                                                        if (day == null) {
+                                                            db.dayDao().insert(new Day(date, addSteps));
+                                                        } else {
+                                                            day.steps += addSteps;
+                                                            db.dayDao().update(day);
+                                                        }
+                                                        StatusFragment statusFragment = StatusFragment.getInstance();
+                                                        statusFragment.refresh();
                                                     }
-                                                    StatusFragment statusFragment = StatusFragment.getInstance();
-                                                    statusFragment.refresh();
                                                 }
                                             })
                                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -103,7 +106,18 @@ public class HistoryFragment extends Fragment {
                                                     Keyboard.hide(getContext());
                                                 }
                                             });
-                                    AlertDialog stepsDialog = builder2.create();
+                                    final AlertDialog stepsDialog = builder2.create();
+                                    stepsDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                                        @Override
+                                        public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                                            if (event.getAction() == KeyEvent.ACTION_DOWN &&
+                                                    keyCode == KeyEvent.KEYCODE_ENTER) {
+                                                stepsDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+                                                return true;
+                                            }
+                                            return false;
+                                        }
+                                    });
                                     stepsDialog.show();
                                     Keyboard.show(getContext());
                                 } else {
