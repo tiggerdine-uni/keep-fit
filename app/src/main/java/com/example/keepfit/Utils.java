@@ -1,8 +1,5 @@
 package com.example.keepfit;
 
-import android.content.Context;
-import android.view.inputmethod.InputMethodManager;
-
 import java.util.Calendar;
 import java.util.Date;
 

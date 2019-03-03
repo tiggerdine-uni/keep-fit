@@ -5,9 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.keepfit.db.AppDatabase;
 
