@@ -24,6 +24,7 @@ import java.util.Date;
 
 import androidx.fragment.app.Fragment;
 
+// TODO HistoryFragment comments
 public class HistoryFragment extends Fragment {
 
     @Override

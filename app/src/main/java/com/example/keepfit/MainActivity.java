@@ -27,18 +27,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Get the database.
         AppDatabase db = AppDatabase.getAppDatabase(this);
+
+        // Manipulate the database.
         manip(db);
 
         setContentView(R.layout.activity_main);
 
+        //
         ViewPager viewPager = findViewById(R.id.viewpager);
         SimpleFragmentPagerAdapter adapter = new SimpleFragmentPagerAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
+        //
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        //
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
     }
@@ -46,15 +52,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
+        // Stop listening to the step counter.
         sensorManager.unregisterListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Check if the step counter is enabled.
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         Boolean scEnabled = sharedPrefs.getBoolean(getString(R.string.settings_step_counter_key), true);
+        // If it is...
         if (scEnabled) {
+            // ... listen to the step counter.
             sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
@@ -76,11 +86,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Manipulates the database.
+     *
+     * @param db the database to be manipulated
+     */
     private void manip(AppDatabase db) {
+        // If there are no goals...
         if (db.goalDao().loadAllVisibleGoals().isEmpty()) {
+            // ... add one.
             Goal goal = new Goal("My First Goal", 1000);
             db.goalDao().insert(goal);
         }
+
 //        db.goalDao().nuke();
 //        db.dayDao().nuke();
 //        Goal goal1 = new Goal("Goal 1", 10000);
@@ -97,10 +115,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
 //        Toast.makeText(this, "" + event.values[0], Toast.LENGTH_SHORT).show();
+        // Add 1 step.
         StatusFragment.getInstance().record(1);
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Do nothing.
     }
 }

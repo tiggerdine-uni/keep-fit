@@ -25,6 +25,8 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
+
+            // This is where the user can clear the history.
             Preference clearHistoryButton = findPreference(getString(R.string.settings_clear_history_key));
             clearHistoryButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override

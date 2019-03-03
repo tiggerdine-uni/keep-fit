@@ -51,7 +51,7 @@ public class StatusFragment extends Fragment {
 
     private AppDatabase db;
     private List<Goal> goals;
-    private ArrayAdapter spinnerArrayAdapter;
+    private ArrayAdapter spinnerAdapter;
     private Goal activeGoal;
 
     static StatusFragment getInstance() {
@@ -77,42 +77,52 @@ public class StatusFragment extends Fragment {
         // Find the spinner.
         spinner = view.findViewById(R.id.spinner);
 
-        //
-        spinnerArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.goal_spinner_item, goals);
+        // Create an adapter.
+        spinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.goal_spinner_item, goals);
 
-        //
-        spinner.setAdapter(spinnerArrayAdapter);
+        // Connect the spinner and the adapter.
+        spinner.setAdapter(spinnerAdapter);
 
-        //
+        // When the user selects an goal...
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Get the selected goal.
                 Goal selectedGoal = (Goal) spinner.getSelectedItem();
+
+                // Update the active goal.
                 SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putInt(getString(R.string.active_goal_id_key), selectedGoal.goalId);
                 editor.apply();
 //                Log.v("StatusFragment", "putting id " + activeGoal.goalId);
+
+                // Update today's entry in the database.
                 Day today = today();
                 today.goalId = selectedGoal.goalId;
                 db.dayDao().update(today);
+
+                // Refresh the views.
                 refresh();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                // Do nothing.
             }
         });
 
-        //
+        // Update the active goal.
         activeGoal = (Goal) spinner.getSelectedItem();
 
         // Find the floating action button.
         FloatingActionButton fab = view.findViewById(R.id.fab);
+
+        // When the user clicks it...
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // ... let them add steps.
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_steps, null);
@@ -125,7 +135,6 @@ public class StatusFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
                                 int steps = Integer.parseInt(et.getText().toString());
-                                // Don't record 0 steps.
                                 if(steps > 0) {
                                     record(steps);
                                 }
@@ -138,6 +147,8 @@ public class StatusFragment extends Fragment {
                             }
                         });
                 final AlertDialog alertDialog = builder.create();
+
+                // Map the enter button of the keyboard to the positive button of the dialog.
                 alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                     @Override
                     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -149,6 +160,7 @@ public class StatusFragment extends Fragment {
                         return false;
                     }
                 });
+
                 alertDialog.show();
                 Keyboard.show(getContext());
             }
@@ -167,8 +179,9 @@ public class StatusFragment extends Fragment {
     }
 
     /**
+     * Records some activity.
      *
-     * @param steps
+     * @param steps the number of steps
      */
     public void record(int steps) {
         Date date = Utils.getDay();
@@ -191,7 +204,7 @@ public class StatusFragment extends Fragment {
         Boolean notifications = sharedPrefs.getBoolean(getString(R.string.settings_notifications_key), false);
         if (notifications && armNotification && today.steps >= (float) activeGoal.steps / 2) {
             showNotification();
-//            Toast.makeText(getContext(), "Kappa123", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "50%", Toast.LENGTH_SHORT).show();
         }
         if (armConfetti && today.steps >= activeGoal.steps) {
             fireConfetti();
@@ -199,16 +212,10 @@ public class StatusFragment extends Fragment {
         refresh();
     }
 
+    /**
+     * Shows a notification.
+     */
     private void showNotification() {
-        /**
-         * The heads-up notification appears the moment your app issues the notification and it disappears after a moment, but remains visible in the notification drawer as usual.
-         *
-         * Example conditions that might trigger heads-up notifications include the following:
-         *
-         * The user's activity is in fullscreen mode (the app uses fullScreenIntent).
-         * The notification has high priority and uses ringtones or vibrations on devices running Android 7.1 (API level 25) and lower.
-         * The notification channel has high importance on devices running Android 8.0 (API level 26) and higher.
-         */
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -217,6 +224,7 @@ public class StatusFragment extends Fragment {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel("0", name, importance);
             channel.setDescription(description);
+            // Enable vibration to make the notification heads-up.
             channel.enableVibration(true);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -229,6 +237,7 @@ public class StatusFragment extends Fragment {
                 .setContentTitle(getText(R.string.notification_title))
                 .setContentText(getText(R.string.notification_text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                // Set vibrate default to make the notification heads-up.
                 .setDefaults(Notification.DEFAULT_VIBRATE);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
@@ -238,7 +247,7 @@ public class StatusFragment extends Fragment {
     }
 
     /**
-     * Fires celebratory confetti.
+     * Fires some celebratory confetti.
      */
     private void fireConfetti() {
         viewKonfetti.build()
@@ -259,8 +268,9 @@ public class StatusFragment extends Fragment {
     }
 
     /**
+     * Tries to find today's entry in the database.
      *
-     * @return
+     * @return today's entry in the database or null
      */
     private Day today() {
         Date date = Utils.getDay();
@@ -275,14 +285,13 @@ public class StatusFragment extends Fragment {
      * Queries the database for goals and refreshes the views.
      */
     void refresh() {
-        //
         goals.clear();
 
         // Query the database for goals.
         goals.addAll(db.goalDao().loadAllVisibleGoals());
 
         // Notify the adapter.
-        spinnerArrayAdapter.notifyDataSetChanged();
+        spinnerAdapter.notifyDataSetChanged();
 
         // Get the id of the active goal.
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -291,24 +300,45 @@ public class StatusFragment extends Fragment {
 
         // Get the active goal.
         activeGoal = db.goalDao().findGoalWithId(activeGoalId);
-        // ...
+
+        // If there is no active goal ...
         if (activeGoal == null) {
-            // ...
+
+            // ... say so.
             statusTv.setText(getString(R.string.no_goals));
+
+        // If there is an active goal...
         } else {
-            spinner.setSelection(spinnerArrayAdapter.getPosition(activeGoal));
+
+            // ... select it.
+            spinner.setSelection(spinnerAdapter.getPosition(activeGoal));
+
+            // Get today's date.
             Date date = Utils.getDay();
+
+            // Try to find today's entry in the database.
             Day today = db.dayDao().findDayWithDate(date);
+
             int steps;
+
+            // If there is no such entry...
             if (today == null) {
                 steps = 0;
+
+            // If there is...
             } else {
                 steps = today.steps;
             }
+
+            // Calculate the user's progress...
             float progress = (float) steps / activeGoal.steps;
+
+            // ... and cap it at 100%.
             if (progress >= 1) {
                 progress = 1;
             }
+
+            // Refresh the views.
             String statusText = steps + "/" + activeGoal.steps;
             statusTv.setText(statusText);
             String progressText = (int) (progress * 100) + "%";
@@ -319,8 +349,9 @@ public class StatusFragment extends Fragment {
     }
 
     /**
+     * Sets the colour of the progress wheel based on the user's progress.
      *
-     * @param progress
+     * @param progress the user's progress
      */
     private void setBarColor(float progress) {
         switch ((int) Math.floor(progress * 10)) {

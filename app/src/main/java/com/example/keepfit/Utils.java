@@ -5,6 +5,11 @@ import java.util.Date;
 
 public class Utils {
 
+    /**
+     * Gets today's date.
+     *
+     * @return today's date
+     */
     public static Date getDay() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY,0);
