@@ -155,14 +155,26 @@ public class GoalFragment extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
                                         Keyboard.hide(getContext());
-                                        // TODO validate against 0 steps
-                                        clickedGoal.name = nameEt.getText().toString();
-                                        clickedGoal.steps = Integer.parseInt(stepsEt.getText().toString());
-                                        db.goalDao().update(clickedGoal);
-                                        adapter.clear();
-                                        adapter.addAll(db.goalDao().loadAllVisibleGoals());
-                                        adapter.notifyDataSetChanged();
-                                        StatusFragment.getInstance().refresh();
+                                        String nameString = nameEt.getText().toString();
+                                        String stepsString = stepsEt.getText().toString();
+                                        if (nameString.trim().isEmpty()) {
+                                            Toast.makeText(getContext(), "Please enter a name.", Toast.LENGTH_SHORT).show();
+                                        } else if (stepsString.isEmpty()) {
+                                            Toast.makeText(getContext(), "Please enter a number of steps.", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            int steps = Integer.parseInt(stepsString);
+                                            if (steps == 0) {
+                                                Toast.makeText(getContext(), "0 steps? What kind of a goal is that?", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                clickedGoal.name = nameString;
+                                                clickedGoal.steps = steps;
+                                                db.goalDao().update(clickedGoal);
+                                                adapter.clear();
+                                                adapter.addAll(db.goalDao().loadAllVisibleGoals());
+                                                adapter.notifyDataSetChanged();
+                                                StatusFragment.getInstance().refresh();
+                                            }
+                                        }
                                     }
                                 })
                                 .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
