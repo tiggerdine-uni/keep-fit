@@ -151,7 +151,7 @@ public class GoalFragment extends Fragment {
                         final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
                         stepsEt.setText("" + clickedGoal.steps);
                         builder.setView(view1)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("Edit Goal", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int id) {
                                         Keyboard.hide(getContext());
@@ -183,7 +183,7 @@ public class GoalFragment extends Fragment {
                                         Keyboard.hide(getContext());
                                     }
                                 })
-                                .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("Delete Goal", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         // TODO maybe confirm?

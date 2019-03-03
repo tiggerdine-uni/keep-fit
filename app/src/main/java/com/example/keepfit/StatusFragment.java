@@ -112,7 +112,7 @@ public class StatusFragment extends Fragment {
                 tv.setText("How many steps?");
                 final EditText et = dialogView.findViewById(R.id.et);
                 builder.setView(dialogView)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
