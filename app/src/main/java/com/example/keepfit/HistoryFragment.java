@@ -47,12 +47,13 @@ public class HistoryFragment extends Fragment {
 //                }
                 final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 final LayoutInflater inflater = getActivity().getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.dialog_history, null);
+                final View dialogView = inflater.inflate(R.layout.dialog_history, null);
                 TextView historyTextView = dialogView.findViewById(R.id.history_text_view);
 
                 String pattern = "EEEE dd MMMM yyyy";
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-                String historyText = "Date: " + simpleDateFormat.format(date);
+                final String dateString = simpleDateFormat.format(date);
+                String historyText = "Date: " + dateString;
                 if (day == null) {
                     historyText += "\nNo activity.";
                 } else {
@@ -61,9 +62,10 @@ public class HistoryFragment extends Fragment {
                         historyText += "\nSteps: " + day.steps;
                     } else {
                         float proportion = (float) day.steps / goal.steps;
-                        if (proportion > 1)
-                            proportion = 1;
-                        historyText += "\nGoal: " + goal.name + "\nGoal Steps: " + goal.steps + "\nSteps: " + day.steps + "\nProportion: " + (int) (proportion * 100) + "%";
+                        if (proportion > 1) proportion = 1;
+                        historyText += "\nGoal: "  + goal.name + " (" + goal.steps +
+                                      ")\nSteps: " + day.steps +
+                                       "\n%: "     + (int) (proportion * 100) + "%";
                     }
                 }
                 historyTextView.setText(historyText);
@@ -76,8 +78,9 @@ public class HistoryFragment extends Fragment {
                                 if(historicActivityRecording) {
                                     AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
                                     View stepsDialogView = inflater.inflate(R.layout.dialog_steps, null);
+                                    TextView tv = stepsDialogView.findViewById(R.id.dialog_steps_tv);
+                                    tv.setText("Date: " + dateString + "\nHow many steps?");
                                     final EditText et = stepsDialogView.findViewById(R.id.et);
-                                    // TODO also show the date here
                                     builder2.setView(stepsDialogView)
                                             .setPositiveButton("Add Steps", new DialogInterface.OnClickListener() {
                                                 @Override

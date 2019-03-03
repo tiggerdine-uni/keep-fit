@@ -31,6 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.util.Date;
 import java.util.List;
@@ -111,6 +112,8 @@ public class StatusFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.dialog_steps, null);
+                TextView tv = dialogView.findViewById(R.id.dialog_steps_tv);
+                tv.setText("How many steps?");
                 final EditText et = dialogView.findViewById(R.id.et);
                 builder.setView(dialogView)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
