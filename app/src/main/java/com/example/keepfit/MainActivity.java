@@ -12,8 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.keepfit.db.AppDatabase;
+import com.example.keepfit.db.entity.Day;
 import com.example.keepfit.db.entity.Goal;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
@@ -119,6 +123,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        db.goalDao().insert(goal2);
 //        db.goalDao().insert(goal3);
 //        db.goalDao().insert(goal4);
+
+        // These lines were used for screenshots.
+        db.dayDao().nuke();
+        db.goalDao().nuke();
+        Goal goal = new Goal("2K", 2000);
+        db.goalDao().insert(goal);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
+        Day day = new Day(cal.getTime(), 1506);
+        Goal goal2 = db.goalDao().findVisibleGoalWithName("2K");
+        day.goalId = goal2.goalId;
+        db.dayDao().insert(day);
     }
 
     @Override

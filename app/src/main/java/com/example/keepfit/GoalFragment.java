@@ -70,7 +70,7 @@ public class GoalFragment extends Fragment {
                 final EditText nameEt = view1.findViewById(R.id.goal_name_et);
                 final EditText stepsEt = view1.findViewById(R.id.goal_steps_et);
                 builder.setView(view1)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Add Goal", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 Keyboard.hide(getContext());
@@ -99,7 +99,7 @@ public class GoalFragment extends Fragment {
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(DialogInterface dialog, int which) {
                                 Keyboard.hide(getContext());
                             }
                         });
@@ -199,7 +199,12 @@ public class GoalFragment extends Fragment {
                                                 adapter.notifyDataSetChanged();
                                                 StatusFragment.getInstance().refresh();
                                             }
-                                        }).setNegativeButton("No", null);
+                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Keyboard.hide(getContext());
+                                            }
+                                        });
                                         AlertDialog confirmDialog = builder.create();
                                         confirmDialog.show();
                                     }

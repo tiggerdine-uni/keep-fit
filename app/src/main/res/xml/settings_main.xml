@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings_title">
 
-    <CheckBoxPreference
+    <SwitchPreference
         android:defaultValue="true"
         android:key="@string/settings_goal_editing_key"
         android:title="Goal Editing"
@@ -17,7 +17,7 @@
         android:summaryOff="Disabled"
         android:defaultValue="true"/>
 
-    <CheckBoxPreference
+    <SwitchPreference
         android:title="Notifications"
         android:key="@string/settings_notifications_key"
         android:summaryOn="On"
