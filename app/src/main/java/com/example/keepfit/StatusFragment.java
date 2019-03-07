@@ -251,11 +251,7 @@ public class StatusFragment extends Fragment {
      */
     private void fireConfetti() {
         viewKonfetti.build()
-                .addColors(R.color.colorConfetti1,
-                           R.color.colorConfetti2,
-                           R.color.colorConfetti3,
-                           R.color.colorConfetti4,
-                           R.color.colorConfetti5)
+                .addColors(0xa864fd, 0x29cdff, 0x78ff44, 0xff718d, 0xfdff6a)
                 .setDirection(0.0, 359.0)
                 .setSpeed(1f, 5f)
                 .setFadeOutEnabled(true)
